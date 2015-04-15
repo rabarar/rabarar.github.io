@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Guitar | Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/blog/categories/guitar/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-04-15T15:17:57-04:00</updated>
+  <updated>2015-04-15T15:20:21-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[VexTab! Musical Notiation]]></title>
+    <title type="html"><![CDATA[VexTab! Musical Notiation in HTML]]></title>
     <link href="http://rabarar.github.io/blog/2015/04/15/vextab-awesomness-for-musical-notiation/"/>
     <updated>2015-04-15T15:07:08-04:00</updated>
     <id>http://rabarar.github.io/blog/2015/04/15/vextab-awesomness-for-musical-notiation</id>
@@ -24,7 +24,7 @@
 
 <p>I&rsquo;m very excited!! I randomly found a great piece of software developed by <strong>Mohit Muthanna Cheppudira</strong> that generates Musical notation and Guitar Tab.</p>
 
-<p>Download the javascript or use the Chrome Extension and you can quickly encode musical notation like this:</p>
+<p>Download the <a href="http://github.com/0xfe/vextab">javascript</a> or use the <a href="https://chrome.google.com/webstore/detail/npcffdibegeppkebphaghnpkcjcpopjf">Chrome Extension</a> and you can quickly encode musical notation like this:</p>
 
 <pre><code>tabstave
   notation=true
