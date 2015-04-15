@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Obfuscation | Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/blog/categories/obfuscation/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2015-04-15T15:05:39-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Code Doodling With Go]]></title>
+    <link href="http://rabarar.github.io/blog/2015/03/01/code-doodling-with-go/"/>
+    <updated>2015-03-01T13:11:00-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/03/01/code-doodling-with-go</id>
+    <content type="html"><![CDATA[<p>Today, the weather was less than attractive so I thought I&rsquo;d play around with Go routines, channels, and functions.</p>
+
+<p>Take a look at the following code:</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">main</span><span class="p">&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kn">import</span> <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">fmt</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">type</span> <span class="nx">fTyp</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">Doer</span>   <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="kt">error</span>
+</span><span class='line'>        <span class="nx">Seeker</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="kt">error</span><span class="p">)</span> <span class="kt">error</span>
+</span><span class='line'>        <span class="nx">Wander</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="kt">error</span><span class="p">)</span> <span class="kt">error</span><span class="p">)</span> <span class="kt">error</span>
+</span><span class='line'>        <span class="nx">With</span>   <span class="kt">int</span>
+</span><span class='line'><span class="p">}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">do</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="nx">fTyp</span><span class="p">)</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">o</span> <span class="nx">fTyp</span> <span class="p">=</span> <span class="nx">fTyp</span><span class="p">{</span><span class="nx">Doer</span><span class="p">:</span> <span class="nx">foo</span><span class="p">,</span> <span class="nx">Seeker</span><span class="p">:</span> <span class="nx">bar</span><span class="p">,</span> <span class="nx">Wander</span><span class="p">:</span> <span class="nx">wander</span><span class="p">,</span> <span class="nx">With</span><span class="p">:</span> <span class="mi">3</span><span class="p">}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">pre</span><span class="p">&gt;&lt;</span><span class="nx">code</span><span class="p">&gt;</span>    <span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">f</span> <span class="nx">fTyp</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">do</span> <span class="o">&amp;</span><span class="nx">lt</span><span class="p">;</span><span class="o">-</span> <span class="nx">f</span>
+</span><span class='line'>    <span class="p">}(</span><span class="nx">o</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">stuff</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">lt</span><span class="p">;</span><span class="o">-</span><span class="nx">do</span>
+</span><span class='line'>    <span class="nx">stuff</span><span class="p">.</span><span class="nx">Doer</span><span class="p">(</span><span class="nx">stuff</span><span class="p">.</span><span class="nx">With</span><span class="p">)</span>
+</span><span class='line'>    <span class="nx">stuff</span><span class="p">.</span><span class="nx">Seeker</span><span class="p">(</span><span class="nx">stuff</span><span class="p">.</span><span class="nx">With</span><span class="p">,</span> <span class="nx">stuff</span><span class="p">.</span><span class="nx">Doer</span><span class="p">)</span>
+</span><span class='line'>    <span class="nx">stuff</span><span class="p">.</span><span class="nx">Wander</span><span class="p">(</span><span class="nx">stuff</span><span class="p">.</span><span class="nx">With</span><span class="p">,</span> <span class="nx">stuff</span><span class="p">.</span><span class="nx">Seeker</span><span class="p">)</span>
+</span><span class='line'><span class="p">&lt;</span><span class="o">/</span><span class="nx">code</span><span class="p">&gt;&lt;</span><span class="o">/</span><span class="nx">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">func</span> <span class="nx">foo</span><span class="p">(</span><span class="nx">id</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">foo</span><span class="p">:</span> <span class="o">%</span><span class="nx">d</span><span class="err">\</span><span class="nx">n</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span> <span class="nx">id</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="kc">nil</span>
+</span><span class='line'><span class="p">}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">func</span> <span class="nx">bar</span><span class="p">(</span><span class="nx">id</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">f</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="kt">error</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">f</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="kc">nil</span>
+</span><span class='line'><span class="p">}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">func</span> <span class="nx">wander</span><span class="p">(</span><span class="nx">id</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">f</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="kt">error</span><span class="p">)</span> <span class="kt">error</span><span class="p">)</span> <span class="kt">error</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">f</span><span class="p">(</span><span class="nx">id</span><span class="p">,</span> <span class="nx">foo</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="kc">nil</span>
+</span><span class='line'><span class="p">}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>Who&rsquo;s ready to go (no pun intended) a step further and create an additional member to the <strong>fTyp struct</strong> and corresponding functions that will extend the meta-abstraction passing <strong>stuff.Wander</strong> as a parameter?</p>
+
+<p>The things we do in the name of entertainment!</p>
+]]></content>
+  </entry>
+  
+</feed>

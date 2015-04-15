@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Mongodb | Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/blog/categories/mongodb/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2015-04-15T15:05:39-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[MongoDB and Go!]]></title>
+    <link href="http://rabarar.github.io/blog/2015/01/03/mongodb-and-go/"/>
+    <updated>2015-01-03T15:15:24-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/01/03/mongodb-and-go</id>
+    <content type="html"><![CDATA[<p>MongoDB and Go, a pair meant to be together!</p>
+
+<p>I&rsquo;ve recently been working on a start-up that&rsquo;s afforded me the need to get better acquainted with Mongodb and Go. Quickly working with these two technologies, one feels that they were meant for each other. Throw in the json package and you&rsquo;re cooking with Gasoline!</p>
+
+<p>The fun begins when you go wild with the use of map[string]interface{} and []map[string]interface{}. At first glance to the noob, these are daunting looking type definitions. But with a little experimenting to get you legs underneath you, you&rsquo;ll find that you coudn&rsquo;t live without these guys! And for good measure, their big brother, interface{}, is pretty handy too when you want to generically throw these guys around and inspect them through Go&rsquo;s reflect package to see what type you&rsquo;re dealing with at runtime.</p>
+
+<p>Here&rsquo;s the <a href="http://labix.org/mgo">driver</a> that I find works nicely with mongodb</p>
+
+<p>More later&hellip;</p>
+]]></content>
+  </entry>
+  
+</feed>

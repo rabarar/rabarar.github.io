@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Blogging | Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/blog/categories/blogging/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2015-04-15T15:05:39-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Goofing Around With Atom]]></title>
+    <link href="http://rabarar.github.io/blog/2015/02/22/goofing-around-with-atom/"/>
+    <updated>2015-02-22T17:41:00-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/02/22/goofing-around-with-atom</id>
+    <content type="html"><![CDATA[<p>Today, I installed Atom! It&rsquo;s nice&hellip; and certainly better than blogging using <strong>vi</strong> but I have to say the documentation isn&rsquo;t the greatest!</p>
+
+<p>I&rsquo;ll hack around at it and see if I can make it a permanent part of my blogging toolbag</p>
+]]></content>
+  </entry>
+  
+</feed>

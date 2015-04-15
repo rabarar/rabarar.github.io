@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Golang, | Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/blog/categories/golang/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2015-04-15T15:05:39-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Gin and Martini: Go Have Fun With Web Services Frameworks!]]></title>
+    <link href="http://rabarar.github.io/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks/"/>
+    <updated>2014-12-15T21:47:32-05:00</updated>
+    <id>http://rabarar.github.io/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks</id>
+    <content type="html"><![CDATA[<p>Building web services with Go is pretty straight-forward. See the <a href="https://golang.org/doc/">godocs for http</a> to see how to write both client and server code.</p>
+
+<p>With a little more help, we can go beyond the standard Go packages and use a package web framework that accelerates the development of a web service stack. These frameworks do a few basic things:</p>
+
+<pre><code>1. Routing
+2. Parameter Handling
+3. JSON marshalling and unmarshalling
+4. HTML templates and form processing
+</code></pre>
+
+<p>Below are two fo the frameworks that are VERY light weight and easy to use:</p>
+
+<pre><code>1. Martini
+2. Gin
+</code></pre>
+
+<p>Basically both of these frameworks are very similar with the biggest difference being that Martini supports <a href="http://blog.parse.com/2014/05/13/dependency-injection-with-go/">Dependency Injection</a>. Gin uses a Context for its parameters.</p>
+
+<ol>
+<li><a href="http://martini.codegangsta.io">Martini</a></li>
+<li><a href="http://gin-gonic.github.io/gin"/>Gin<a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Bloom Filter's in Golang]]></title>
+    <link href="http://rabarar.github.io/blog/2014/12/03/bloom-filters-on-golang/"/>
+    <updated>2014-12-03T14:34:20-05:00</updated>
+    <id>http://rabarar.github.io/blog/2014/12/03/bloom-filters-on-golang</id>
+    <content type="html"><![CDATA[<p>Implementing and Benchmarking Bloom Filters in Golang:</p>
+
+<p>Here&rsquo;s a great <a href="http://zhen.org/blog/benchmarking-bloom-filters-and-hash-functions-in-go/">article</a> on impementing and benchmarking Bloom Filters in Golang.</p>
+
+<p>Three separate types of filters are implements: Standard, Partitioned, and Scalable.</p>
+
+<p>For a detailed <a href="http://www.dca.fee.unicamp.br/~chesteve/pubs/bloom-filter-ieee-survey-preprint.pdf">look</a> Read is paper.</p>
+]]></content>
+  </entry>
+  
+</feed>

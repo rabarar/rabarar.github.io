@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Restful | Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/blog/categories/restful/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2015-04-15T15:05:39-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[v2.1.0 of Go-Json-Rest Is Out! With Apache Style Logging]]></title>
+    <link href="http://rabarar.github.io/blog/2014/12/01/v2-dot-1-0-of-go-json-rest-is-out-with-apache-style-logging/"/>
+    <updated>2014-12-01T15:06:42-05:00</updated>
+    <id>http://rabarar.github.io/blog/2014/12/01/v2-dot-1-0-of-go-json-rest-is-out-with-apache-style-logging</id>
+    <content type="html"><![CDATA[<p>Another RESTful golang JSON package is available to quickly support the development of RESTful JSON-based server apps.</p>
+
+<p><code>git clone https://github.com/ant0ine/go-json-rest.git</code></p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Bloom | Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/blog/categories/bloom/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2015-04-15T15:05:39-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Bloom Filter's in Golang]]></title>
+    <link href="http://rabarar.github.io/blog/2014/12/03/bloom-filters-on-golang/"/>
+    <updated>2014-12-03T14:34:20-05:00</updated>
+    <id>http://rabarar.github.io/blog/2014/12/03/bloom-filters-on-golang</id>
+    <content type="html"><![CDATA[<p>Implementing and Benchmarking Bloom Filters in Golang:</p>
+
+<p>Here&rsquo;s a great <a href="http://zhen.org/blog/benchmarking-bloom-filters-and-hash-functions-in-go/">article</a> on impementing and benchmarking Bloom Filters in Golang.</p>
+
+<p>Three separate types of filters are implements: Standard, Partitioned, and Scalable.</p>
+
+<p>For a detailed <a href="http://www.dca.fee.unicamp.br/~chesteve/pubs/bloom-filter-ieee-survey-preprint.pdf">look</a> Read is paper.</p>
+]]></content>
+  </entry>
+  
+</feed>

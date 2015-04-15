@@ -1,96 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
 
-<!DOCTYPE html>
-<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
-<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
-<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
-<head>
-  <meta charset="utf-8">
-  <title>Rabarar&#39;s Blog</title>
-  <meta name="author" content="Rob Baruch">
-
-  
-  <meta name="description" content="Today, the weather was less than attractive so I thought I&rsquo;d play around with Go routines, channels, and functions. Take a look at the &hellip;">
-  
-
-  <!-- http://t.co/dKP3o1e -->
-  <meta name="HandheldFriendly" content="True">
-  <meta name="MobileOptimized" content="320">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><![CDATA[Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2015-04-15T15:05:39-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
 
   
-  <link rel="canonical" href="http://rabarar.github.io">
-  <link href="/favicon.png" rel="icon">
-  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
-  <link href="/atom.xml" rel="alternate" title="Rabarar\'s Blog" type="application/atom+xml">
-  <script src="/javascripts/modernizr-2.0.js"></script>
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
-  <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
-<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
-
-  
-
-</head>
-
-<body   >
-  <header role="banner"><hgroup>
-  <h1><a href="/">Rabarar&#39;s Blog</a></h1>
-  
-    <h2>A blogging framework for mild hackers.</h2>
-  
-</hgroup>
-
-</header>
-  <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
-  
-</ul>
-  
-<form action="https://www.google.com/search" method="get">
-  <fieldset role="search">
-    <input type="hidden" name="q" value="site:rabarar.github.io" />
-    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
-  </fieldset>
-</form>
-  
-<ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
-  <li><a href="/blog/archives">Archives</a></li>
-</ul>
-
-</nav>
-  <div id="main">
-    <div id="content">
-      <div class="blog-index">
-  
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/03/01/code-doodling-with-go/">Code Doodling With Go</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-03-01T13:11:00-05:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2015</span></span> <span class='time'>1:11 pm</span></time>
-        
-           | <a href="/blog/2015/03/01/code-doodling-with-go/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/03/01/code-doodling-with-go/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Today, the weather was less than attractive so I thought I&rsquo;d play around with Go routines, channels, and functions.</p>
+  <entry>
+    <title type="html"><![CDATA[Code Doodling With Go]]></title>
+    <link href="http://rabarar.github.io/blog/2015/03/01/code-doodling-with-go/"/>
+    <updated>2015-03-01T13:11:00-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/03/01/code-doodling-with-go</id>
+    <content type="html"><![CDATA[<p>Today, the weather was less than attractive so I thought I&rsquo;d play around with Go routines, channels, and functions.</p>
 
 <p>Take a look at the following code:</p>
 
@@ -178,72 +106,26 @@
 <p>Who&rsquo;s ready to go (no pun intended) a step further and create an additional member to the <strong>fTyp struct</strong> and corresponding functions that will extend the meta-abstraction passing <strong>stuff.Wander</strong> as a parameter?</p>
 
 <p>The things we do in the name of entertainment!</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/02/22/goofing-around-with-atom/">Goofing Around With Atom</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-02-22T17:41:00-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>5:41 pm</span></time>
-        
-           | <a href="/blog/2015/02/22/goofing-around-with-atom/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/02/22/goofing-around-with-atom/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Today, I installed Atom! It&rsquo;s nice&hellip; and certainly better than blogging using <strong>vi</strong> but I have to say the documentation isn&rsquo;t the greatest!</p>
+  <entry>
+    <title type="html"><![CDATA[Goofing Around With Atom]]></title>
+    <link href="http://rabarar.github.io/blog/2015/02/22/goofing-around-with-atom/"/>
+    <updated>2015-02-22T17:41:00-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/02/22/goofing-around-with-atom</id>
+    <content type="html"><![CDATA[<p>Today, I installed Atom! It&rsquo;s nice&hellip; and certainly better than blogging using <strong>vi</strong> but I have to say the documentation isn&rsquo;t the greatest!</p>
 
 <p>I&rsquo;ll hack around at it and see if I can make it a permanent part of my blogging toolbag</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/02/17/goroutines-channels/">GoRoutines, Channels, and Proper Exits</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-02-17T15:12:13-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:12 pm</span></time>
-        
-           | <a href="/blog/2015/02/17/goroutines-channels/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/02/17/goroutines-channels/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I read a great article summarizing the interrelationship between go routines, channel communications, unix signals and proper termination by <a href="http://adampresley.com/2015/02/16/waiting-for-goroutines-to-finish-running-before-exiting.html">Adam Presley</a>. In his article he describes how to coordinate starting a go routine, handling an interrupt, and then communicating through a channel to the go routine that the program wants to terminate.</p>
+  <entry>
+    <title type="html"><![CDATA[GoRoutines, Channels, and Proper Exits]]></title>
+    <link href="http://rabarar.github.io/blog/2015/02/17/goroutines-channels/"/>
+    <updated>2015-02-17T15:12:13-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/02/17/goroutines-channels</id>
+    <content type="html"><![CDATA[<p>I read a great article summarizing the interrelationship between go routines, channel communications, unix signals and proper termination by <a href="http://adampresley.com/2015/02/16/waiting-for-goroutines-to-finish-running-before-exiting.html">Adam Presley</a>. In his article he describes how to coordinate starting a go routine, handling an interrupt, and then communicating through a channel to the go routine that the program wants to terminate.</p>
 
 <p>So what do you do if you have more than one go routine? You need to communicate to all and wait for all when you quit. Here&rsquo;s a contrived example that demonstrates one way to do it.</p>
 
@@ -486,38 +368,15 @@
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/02/09/spying-on-files-with-fsnotify/">Spying on Files With Fsnotify</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-02-09T15:06:49-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:06 pm</span></time>
-        
-           | <a href="/blog/2015/02/09/spying-on-files-with-fsnotify/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/02/09/spying-on-files-with-fsnotify/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Sometimes you want to automate a workflow process by watching a filesystem directory and treating it like a work queue. As files arrive in the directory, a process watching the directory can be notified of new work items and kick off a process to perform the desired task.</p>
+  <entry>
+    <title type="html"><![CDATA[Spying on Files With Fsnotify]]></title>
+    <link href="http://rabarar.github.io/blog/2015/02/09/spying-on-files-with-fsnotify/"/>
+    <updated>2015-02-09T15:06:49-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/02/09/spying-on-files-with-fsnotify</id>
+    <content type="html"><![CDATA[<p>Sometimes you want to automate a workflow process by watching a filesystem directory and treating it like a work queue. As files arrive in the directory, a process watching the directory can be notified of new work items and kick off a process to perform the desired task.</p>
 
 <p>A golang package called <a href="http://godoc.org/gopkg.in/fsnotify.v1">fsnotify</a> does most of the nitty-gritty to make the details of implementing a queue manager somewhat trivial. Below is an example of how you would set up a queue to watch a directory using the package:</p>
 
@@ -599,38 +458,15 @@
 
 
 <p>In the main of the golang program, we create a new watcher and start a go-routine that selects events from the watcher Events channel. Each event is logged and then if an event of type &lsquo;fsnotiy.Write&rsquo; is received by the watcher, an additional log message is printed. Outside of the go-routine, we add the /tmp/foo directory to the watcher and wait on the done channel (which will block indefinitely).</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/02/07/color-my-world-or-at-least-my-logfiles/">Color My World! Or at Least My Logfiles</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-02-07T12:07:51-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>7</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:07 pm</span></time>
-        
-           | <a href="/blog/2015/02/07/color-my-world-or-at-least-my-logfiles/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/02/07/color-my-world-or-at-least-my-logfiles/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Here&rsquo;s a fun little <a href="https://github.com/aybabtme/rgbterm">git</a> I came across from Antoine Grondin. It&rsquo;s a cute little logfile color package to make your logfiles really pop!</p>
+  <entry>
+    <title type="html"><![CDATA[Color My World! Or at Least My Logfiles]]></title>
+    <link href="http://rabarar.github.io/blog/2015/02/07/color-my-world-or-at-least-my-logfiles/"/>
+    <updated>2015-02-07T12:07:51-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/02/07/color-my-world-or-at-least-my-logfiles</id>
+    <content type="html"><![CDATA[<p>Here&rsquo;s a fun little <a href="https://github.com/aybabtme/rgbterm">git</a> I came across from Antoine Grondin. It&rsquo;s a cute little logfile color package to make your logfiles really pop!</p>
 
 <p>Tired of those old boring foreground on background logs? Well, try this!</p>
 
@@ -725,76 +561,30 @@
 
 
 <p>Enjoy!</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/01/18/wake-me-up-before-you-logo/">Wake Me Up Before You Logo!</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-01-18T11:54:38-05:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:54 am</span></time>
-        
-           | <a href="/blog/2015/01/18/wake-me-up-before-you-logo/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/01/18/wake-me-up-before-you-logo/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Just for fun, I thought I&rsquo;d play around with <a href="http://www.alancsmith.co.uk/logo/">Alan Smith&rsquo;s ACSLogo</a> for Mac. This great program is a full-featured Logo interpreter that is perfectly suited for teaching basic programming and math concepts to people of all ages.</p>
+  <entry>
+    <title type="html"><![CDATA[Wake Me Up Before You Logo!]]></title>
+    <link href="http://rabarar.github.io/blog/2015/01/18/wake-me-up-before-you-logo/"/>
+    <updated>2015-01-18T11:54:38-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/01/18/wake-me-up-before-you-logo</id>
+    <content type="html"><![CDATA[<p>Just for fun, I thought I&rsquo;d play around with <a href="http://www.alancsmith.co.uk/logo/">Alan Smith&rsquo;s ACSLogo</a> for Mac. This great program is a full-featured Logo interpreter that is perfectly suited for teaching basic programming and math concepts to people of all ages.</p>
 
 <p>I&rsquo;ve put together a <a href="https://github.com/rabarar/LogoPlay">repo</a> on github that is a collection of fun and interesting procedures mostly do perform graphically interesting recusive problems. Feel free to add to the collection!</p>
 
 <p>I strongly suggest start by reading the <a href="http://www.alancsmith.co.uk/logo/LogoUserGuide151.pdf">User Guide</a> and the <a href="http://www.alancsmith.co.uk/logo/Logocommandref151.pdf">Command Reference</a> documents to orient yourself to the Logo dialect.</p>
 
 <p>Have Fun!</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/01/03/mongodb-and-go/">MongoDB and Go!</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-01-03T15:15:24-05:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>3:15 pm</span></time>
-        
-           | <a href="/blog/2015/01/03/mongodb-and-go/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/01/03/mongodb-and-go/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>MongoDB and Go, a pair meant to be together!</p>
+  <entry>
+    <title type="html"><![CDATA[MongoDB and Go!]]></title>
+    <link href="http://rabarar.github.io/blog/2015/01/03/mongodb-and-go/"/>
+    <updated>2015-01-03T15:15:24-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/01/03/mongodb-and-go</id>
+    <content type="html"><![CDATA[<p>MongoDB and Go, a pair meant to be together!</p>
 
 <p>I&rsquo;ve recently been working on a start-up that&rsquo;s afforded me the need to get better acquainted with Mongodb and Go. Quickly working with these two technologies, one feels that they were meant for each other. Throw in the json package and you&rsquo;re cooking with Gasoline!</p>
 
@@ -803,38 +593,15 @@
 <p>Here&rsquo;s the <a href="http://labix.org/mgo">driver</a> that I find works nicely with mongodb</p>
 
 <p>More later&hellip;</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks/">Gin and Martini: Go Have Fun With Web Services Frameworks!</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-12-15T21:47:32-05:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:47 pm</span></time>
-        
-           | <a href="/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Building web services with Go is pretty straight-forward. See the <a href="https://golang.org/doc/">godocs for http</a> to see how to write both client and server code.</p>
+  <entry>
+    <title type="html"><![CDATA[Gin and Martini: Go Have Fun With Web Services Frameworks!]]></title>
+    <link href="http://rabarar.github.io/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks/"/>
+    <updated>2014-12-15T21:47:32-05:00</updated>
+    <id>http://rabarar.github.io/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks</id>
+    <content type="html"><![CDATA[<p>Building web services with Go is pretty straight-forward. See the <a href="https://golang.org/doc/">godocs for http</a> to see how to write both client and server code.</p>
 
 <p>With a little more help, we can go beyond the standard Go packages and use a package web framework that accelerates the development of a web service stack. These frameworks do a few basic things:</p>
 
@@ -857,76 +624,30 @@
 <li><a href="http://gin-gonic.github.io/gin"/>Gin<a></li>
 </ol>
 
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/12/03/bloom-filters-on-golang/">Bloom Filter&#8217;s in Golang</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-12-03T14:34:20-05:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2014</span></span> <span class='time'>2:34 pm</span></time>
-        
-           | <a href="/blog/2014/12/03/bloom-filters-on-golang/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2014/12/03/bloom-filters-on-golang/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Implementing and Benchmarking Bloom Filters in Golang:</p>
+  <entry>
+    <title type="html"><![CDATA[Bloom Filter's in Golang]]></title>
+    <link href="http://rabarar.github.io/blog/2014/12/03/bloom-filters-on-golang/"/>
+    <updated>2014-12-03T14:34:20-05:00</updated>
+    <id>http://rabarar.github.io/blog/2014/12/03/bloom-filters-on-golang</id>
+    <content type="html"><![CDATA[<p>Implementing and Benchmarking Bloom Filters in Golang:</p>
 
 <p>Here&rsquo;s a great <a href="http://zhen.org/blog/benchmarking-bloom-filters-and-hash-functions-in-go/">article</a> on impementing and benchmarking Bloom Filters in Golang.</p>
 
 <p>Three separate types of filters are implements: Standard, Partitioned, and Scalable.</p>
 
 <p>For a detailed <a href="http://www.dca.fee.unicamp.br/~chesteve/pubs/bloom-filter-ieee-survey-preprint.pdf">look</a> Read is paper.</p>
-</div>
+]]></content>
+  </entry>
   
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/12/01/golang-file-upload-processing/">Golang File Upload Processing</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2014-12-01T15:29:39-05:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>3:29 pm</span></time>
-        
-           | <a href="/blog/2014/12/01/golang-file-upload-processing/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2014/12/01/golang-file-upload-processing/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Here&rsquo;s a quick sample (credit: astaxie) that demonstrates how to upload a file in golang:</p>
+  <entry>
+    <title type="html"><![CDATA[Golang File Upload Processing]]></title>
+    <link href="http://rabarar.github.io/blog/2014/12/01/golang-file-upload-processing/"/>
+    <updated>2014-12-01T15:29:39-05:00</updated>
+    <id>http://rabarar.github.io/blog/2014/12/01/golang-file-upload-processing</id>
+    <content type="html"><![CDATA[<p>Here&rsquo;s a quick sample (credit: astaxie) that demonstrates how to upload a file in golang:</p>
 
 <p>There are two things going on here: First is the handler section that processes the GET and then the section handling the POST (to be more accurate, we should check the r.Method once more to see if it&rsquo;s exactly the POST method).</p>
 
@@ -1029,110 +750,41 @@
 
 
 <p></p>
-</div>
+]]></content>
+  </entry>
   
+  <entry>
+    <title type="html"><![CDATA[v2.1.0 of Go-Json-Rest Is Out! With Apache Style Logging]]></title>
+    <link href="http://rabarar.github.io/blog/2014/12/01/v2-dot-1-0-of-go-json-rest-is-out-with-apache-style-logging/"/>
+    <updated>2014-12-01T15:06:42-05:00</updated>
+    <id>http://rabarar.github.io/blog/2014/12/01/v2-dot-1-0-of-go-json-rest-is-out-with-apache-style-logging</id>
+    <content type="html"><![CDATA[<p>Another RESTful golang JSON package is available to quickly support the development of RESTful JSON-based server apps.</p>
+
+<p><code>git clone https://github.com/ant0ine/go-json-rest.git</code></p>
+]]></content>
+  </entry>
   
+  <entry>
+    <title type="html"><![CDATA[Uncertanty]]></title>
+    <link href="http://rabarar.github.io/blog/2014/12/01/uncertanty/"/>
+    <updated>2014-12-01T08:56:04-05:00</updated>
+    <id>http://rabarar.github.io/blog/2014/12/01/uncertanty</id>
+    <content type="html"><![CDATA[<p>Tripped over a post today inspired from the new movie coming out about Allan Turing, and it got me searching the web to read more about his thoughts on uncomputability. And then that led into an article talking about uncertainty, and incompleteness juxtaposed next to uncomputability. There&rsquo;s something Euler equation-like about these three elements being placed in one contemplation.</p>
 
-
-    </article>
+<p>This is what I will think about today. Surely there is a deeper connection between all three of these mathematical philosophies that govern the physical world.</p>
+]]></content>
+  </entry>
   
-  <div class="pagination">
-    
-      <a class="prev" href="/posts/2">&larr; Older</a>
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
-<aside class="sidebar">
+  <entry>
+    <title type="html"><![CDATA[Rabarar's Attempt at Setting Up Octopress]]></title>
+    <link href="http://rabarar.github.io/blog/2014/11/30/rabarars-attempt-at-setting-up-octopress/"/>
+    <updated>2014-11-30T21:59:02-05:00</updated>
+    <id>http://rabarar.github.io/blog/2014/11/30/rabarars-attempt-at-setting-up-octopress</id>
+    <content type="html"><![CDATA[<p>First blog post!</p>
+
+<p>A quick install and a setup of the Octopress Blog on github.io!
+Stay tuned for Golang Rants :)</p>
+]]></content>
+  </entry>
   
-    <section>
-  <h1>Recent Posts</h1>
-  <ul id="recent_posts">
-    
-      <li class="post">
-        <a href="/blog/2015/03/01/code-doodling-with-go/">Code Doodling With Go</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/22/goofing-around-with-atom/">Goofing Around With Atom</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/17/goroutines-channels/">GoRoutines, Channels, and Proper Exits</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/09/spying-on-files-with-fsnotify/">Spying on Files With Fsnotify</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/07/color-my-world-or-at-least-my-logfiles/">Color My World! Or at Least My Logfiles</a>
-      </li>
-    
-  </ul>
-</section>
-
-
-
-
-
-  
-</aside>
-
-    </div>
-  </div>
-  <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Rob Baruch -
-  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
-  <a href='http://www.facebook.com/robertbaruch' target='_blank'>
-	    <img src='/images/footer/facebook-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
-    </a>
-
-      <a href='https://twitter.com/rabarar' target='_blank'>
-	        <img src='/images/footer/twitter-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
-	</a>
-
-	<a href='https://github.com/rabarar' target='_blank'>
-		  <img src='/images/footer/github-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
-	  </a>
-</p>
-
-</footer>
-  
-
-<script type="text/javascript">
-      var disqus_shortname = 'rabarargithubio';
-      
-        
-        var disqus_script = 'count.js';
-      
-    (function () {
-      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
-      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-    }());
-</script>
-
-
-
-
-
-
-
-  <script type="text/javascript">
-    (function(){
-      var twitterWidgets = document.createElement('script');
-      twitterWidgets.type = 'text/javascript';
-      twitterWidgets.async = true;
-      twitterWidgets.src = '//platform.twitter.com/widgets.js';
-      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
-    })();
-  </script>
-
-
-
-
-
-</body>
-</html>
+</feed>

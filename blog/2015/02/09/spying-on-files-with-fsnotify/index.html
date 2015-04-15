@@ -1,0 +1,322 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Spying on Files With Fsnotify - Rabarar&#39;s Blog</title>
+  <meta name="author" content="Rob Baruch">
+
+  
+  <meta name="description" content="Sometimes you want to automate a workflow process by watching a filesystem directory and treating it like a work queue. As files arrive in the &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://rabarar.github.io/blog/2015/02/09/spying-on-files-with-fsnotify">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rabarar\'s Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Rabarar&#39;s Blog</a></h1>
+  
+    <h2>A blogging framework for mild hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rabarar.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Spying on Files With Fsnotify</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-02-09T15:06:49-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:06 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Sometimes you want to automate a workflow process by watching a filesystem directory and treating it like a work queue. As files arrive in the directory, a process watching the directory can be notified of new work items and kick off a process to perform the desired task.</p>
+
+<p>A golang package called <a href="http://godoc.org/gopkg.in/fsnotify.v1">fsnotify</a> does most of the nitty-gritty to make the details of implementing a queue manager somewhat trivial. Below is an example of how you would set up a queue to watch a directory using the package:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'>   <span class="kn">package</span> <span class="nx">main</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'>      <span class="s">&quot;log&quot;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="s">&quot;github.com/go-fsnotify/fsnotify&quot;</span>
+</span><span class='line'>  <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">watcher</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">fsnotify</span><span class="p">.</span><span class="nx">NewWatcher</span><span class="p">()</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="k">defer</span> <span class="nx">watcher</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">done</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">for</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">select</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">case</span> <span class="nx">event</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">Events</span><span class="p">:</span>
+</span><span class='line'>                  <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;event:&quot;</span><span class="p">,</span> <span class="nx">event</span><span class="p">)</span>
+</span><span class='line'>                  <span class="k">if</span> <span class="nx">event</span><span class="p">.</span><span class="nx">Op</span><span class="o">&amp;</span><span class="nx">fsnotify</span><span class="p">.</span><span class="nx">Write</span> <span class="o">==</span> <span class="nx">fsnotify</span><span class="p">.</span><span class="nx">Write</span> <span class="p">{</span>
+</span><span class='line'>                      <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;modified file:&quot;</span><span class="p">,</span> <span class="nx">event</span><span class="p">.</span><span class="nx">Name</span><span class="p">)</span>
+</span><span class='line'>                  <span class="p">}</span>
+</span><span class='line'>              <span class="k">case</span> <span class="nx">err</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">Errors</span><span class="p">:</span>
+</span><span class='line'>                  <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;error:&quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>              <span class="p">}</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>      <span class="p">}()</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">err</span> <span class="p">=</span> <span class="nx">watcher</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="s">&quot;/tmp/foo&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="o">&lt;-</span><span class="nx">done</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the main of the golang program, we create a new watcher and start a go-routine that selects events from the watcher Events channel. Each event is logged and then if an event of type &lsquo;fsnotiy.Write&rsquo; is received by the watcher, an additional log message is printed. Outside of the go-routine, we add the /tmp/foo directory to the watcher and wait on the done channel (which will block indefinitely).</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Baruch</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-02-09T15:06:49-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:06 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/golang/'>golang</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://rabarar.github.io/blog/2015/02/09/spying-on-files-with-fsnotify/" data-via="" data-counturl="http://rabarar.github.io/blog/2015/02/09/spying-on-files-with-fsnotify/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/02/07/color-my-world-or-at-least-my-logfiles/" title="Previous Post: Color my World! Or at least my logfiles">&laquo; Color my World! Or at least my logfiles</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/02/17/goroutines-channels/" title="Next Post: GoRoutines, Channels, and Proper Exits">GoRoutines, Channels, and Proper Exits &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/01/code-doodling-with-go/">Code Doodling With Go</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/22/goofing-around-with-atom/">Goofing Around With Atom</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/17/goroutines-channels/">GoRoutines, Channels, and Proper Exits</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/09/spying-on-files-with-fsnotify/">Spying on Files With Fsnotify</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/07/color-my-world-or-at-least-my-logfiles/">Color My World! Or at Least My Logfiles</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Rob Baruch -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  <a href='http://www.facebook.com/robertbaruch' target='_blank'>
+	    <img src='/images/footer/facebook-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+    </a>
+
+      <a href='https://twitter.com/rabarar' target='_blank'>
+	        <img src='/images/footer/twitter-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+	</a>
+
+	<a href='https://github.com/rabarar' target='_blank'>
+		  <img src='/images/footer/github-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+	  </a>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rabarargithubio';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://rabarar.github.io/blog/2015/02/09/spying-on-files-with-fsnotify/';
+        var disqus_url = 'http://rabarar.github.io/blog/2015/02/09/spying-on-files-with-fsnotify/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

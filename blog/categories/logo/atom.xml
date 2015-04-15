@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Logo | Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/blog/categories/logo/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2015-04-15T15:05:39-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Wake Me Up Before You Logo!]]></title>
+    <link href="http://rabarar.github.io/blog/2015/01/18/wake-me-up-before-you-logo/"/>
+    <updated>2015-01-18T11:54:38-05:00</updated>
+    <id>http://rabarar.github.io/blog/2015/01/18/wake-me-up-before-you-logo</id>
+    <content type="html"><![CDATA[<p>Just for fun, I thought I&rsquo;d play around with <a href="http://www.alancsmith.co.uk/logo/">Alan Smith&rsquo;s ACSLogo</a> for Mac. This great program is a full-featured Logo interpreter that is perfectly suited for teaching basic programming and math concepts to people of all ages.</p>
+
+<p>I&rsquo;ve put together a <a href="https://github.com/rabarar/LogoPlay">repo</a> on github that is a collection of fun and interesting procedures mostly do perform graphically interesting recusive problems. Feel free to add to the collection!</p>
+
+<p>I strongly suggest start by reading the <a href="http://www.alancsmith.co.uk/logo/LogoUserGuide151.pdf">User Guide</a> and the <a href="http://www.alancsmith.co.uk/logo/Logocommandref151.pdf">Command Reference</a> documents to orient yourself to the Logo dialect.</p>
+
+<p>Have Fun!</p>
+]]></content>
+  </entry>
+  
+</feed>

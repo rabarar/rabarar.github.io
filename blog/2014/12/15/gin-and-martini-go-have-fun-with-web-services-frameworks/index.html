@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Gin and Martini: Go Have Fun With Web Services Frameworks! - Rabarar&#39;s Blog</title>
+  <meta name="author" content="Rob Baruch">
+
+  
+  <meta name="description" content="Building web services with Go is pretty straight-forward. See the godocs for http to see how to write both client and server code. With a little more &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://rabarar.github.io/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rabarar\'s Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Rabarar&#39;s Blog</a></h1>
+  
+    <h2>A blogging framework for mild hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rabarar.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Gin and Martini: Go Have Fun With Web Services Frameworks!</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-12-15T21:47:32-05:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:47 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Building web services with Go is pretty straight-forward. See the <a href="https://golang.org/doc/">godocs for http</a> to see how to write both client and server code.</p>
+
+<p>With a little more help, we can go beyond the standard Go packages and use a package web framework that accelerates the development of a web service stack. These frameworks do a few basic things:</p>
+
+<pre><code>1. Routing
+2. Parameter Handling
+3. JSON marshalling and unmarshalling
+4. HTML templates and form processing
+</code></pre>
+
+<p>Below are two fo the frameworks that are VERY light weight and easy to use:</p>
+
+<pre><code>1. Martini
+2. Gin
+</code></pre>
+
+<p>Basically both of these frameworks are very similar with the biggest difference being that Martini supports <a href="http://blog.parse.com/2014/05/13/dependency-injection-with-go/">Dependency Injection</a>. Gin uses a Context for its parameters.</p>
+
+<ol>
+<li><a href="http://martini.codegangsta.io">Martini</a></li>
+<li><a href="http://gin-gonic.github.io/gin"/>Gin<a></li>
+</ol>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Baruch</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2014-12-15T21:47:32-05:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>15</span><span class='date-suffix'>th</span>, <span class='date-year'>2014</span></span> <span class='time'>9:47 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/frameworks/'>frameworks</a>, <a class='category' href='/blog/categories/golang/'>golang,</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://rabarar.github.io/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks/" data-via="" data-counturl="http://rabarar.github.io/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/12/03/bloom-filters-on-golang/" title="Previous Post: Bloom filter's in Golang">&laquo; Bloom filter&#8217;s in Golang</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2015/01/03/mongodb-and-go/" title="Next Post: MongoDB and Go!">MongoDB and Go! &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/03/01/code-doodling-with-go/">Code Doodling With Go</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/22/goofing-around-with-atom/">Goofing Around With Atom</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/17/goroutines-channels/">GoRoutines, Channels, and Proper Exits</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/09/spying-on-files-with-fsnotify/">Spying on Files With Fsnotify</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/02/07/color-my-world-or-at-least-my-logfiles/">Color My World! Or at Least My Logfiles</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Rob Baruch -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  <a href='http://www.facebook.com/robertbaruch' target='_blank'>
+	    <img src='/images/footer/facebook-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+    </a>
+
+      <a href='https://twitter.com/rabarar' target='_blank'>
+	        <img src='/images/footer/twitter-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+	</a>
+
+	<a href='https://github.com/rabarar' target='_blank'>
+		  <img src='/images/footer/github-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+	  </a>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rabarargithubio';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://rabarar.github.io/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks/';
+        var disqus_url = 'http://rabarar.github.io/blog/2014/12/15/gin-and-martini-go-have-fun-with-web-services-frameworks/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
