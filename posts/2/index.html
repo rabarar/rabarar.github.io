@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Baruch">
 
   
-  <meta name="description" content="Another RESTful golang JSON package is available to quickly support the development of RESTful JSON-based server apps. git clone https://github.com/ &hellip;">
+  <meta name="description" content="Here&rsquo;s a quick sample (credit: astaxie) that demonstrates how to upload a file in golang: There are two things going on here: First is the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,140 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/12/01/golang-file-upload-processing/">Golang File Upload Processing</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2014-12-01T15:29:39-05:00'><span class='date'><span class='date-month'>Dec</span> <span class='date-day'>1</span><span class='date-suffix'>st</span>, <span class='date-year'>2014</span></span> <span class='time'>3:29 pm</span></time>
+        
+           | <a href="/blog/2014/12/01/golang-file-upload-processing/#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io/blog/2014/12/01/golang-file-upload-processing/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Here&rsquo;s a quick sample (credit: astaxie) that demonstrates how to upload a file in golang:</p>
+
+<p>There are two things going on here: First is the handler section that processes the GET and then the section handling the POST (to be more accurate, we should check the r.Method once more to see if it&rsquo;s exactly the POST method).</p>
+
+<p>In the get, we generate a token to ensure that the file we receive is indeed the one requested from the GET. Although in this code, there isn&rsquo;t a check to see that that&rsquo;s indeed the case in the POST (left as an exercise for the reader).</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'>   <span class="nx">http</span><span class="p">.</span><span class="nx">HandleFunc</span><span class="p">(</span><span class="s">&quot;/upload&quot;</span><span class="p">,</span> <span class="nx">upload</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="c1">// upload logic</span>
+</span><span class='line'>  <span class="kd">func</span> <span class="nx">upload</span><span class="p">(</span><span class="nx">w</span> <span class="nx">http</span><span class="p">.</span><span class="nx">ResponseWriter</span><span class="p">,</span> <span class="nx">r</span> <span class="o">*</span><span class="nx">http</span><span class="p">.</span><span class="nx">Request</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;method:&quot;</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">r</span><span class="p">.</span><span class="nx">Method</span> <span class="o">==</span> <span class="s">&quot;GET&quot;</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">crutime</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Now</span><span class="p">().</span><span class="nx">Unix</span><span class="p">()</span>
+</span><span class='line'>          <span class="nx">h</span> <span class="o">:=</span> <span class="nx">md5</span><span class="p">.</span><span class="nx">New</span><span class="p">()</span>
+</span><span class='line'>          <span class="nx">io</span><span class="p">.</span><span class="nx">WriteString</span><span class="p">(</span><span class="nx">h</span><span class="p">,</span> <span class="nx">strconv</span><span class="p">.</span><span class="nx">FormatInt</span><span class="p">(</span><span class="nx">crutime</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</span><span class='line'>          <span class="nx">token</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;%x&quot;</span><span class="p">,</span> <span class="nx">h</span><span class="p">.</span><span class="nx">Sum</span><span class="p">(</span><span class="kc">nil</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'>          <span class="nx">t</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="nx">template</span><span class="p">.</span><span class="nx">ParseFiles</span><span class="p">(</span><span class="s">&quot;upload.gtpl&quot;</span><span class="p">)</span>
+</span><span class='line'>          <span class="nx">t</span><span class="p">.</span><span class="nx">Execute</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="nx">token</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">r</span><span class="p">.</span><span class="nx">ParseMultipartForm</span><span class="p">(</span><span class="mi">32</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">)</span>
+</span><span class='line'>          <span class="nx">file</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">r</span><span class="p">.</span><span class="nx">FormFile</span><span class="p">(</span><span class="s">&quot;uploadfile&quot;</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>              <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>              <span class="k">return</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>          <span class="k">defer</span> <span class="nx">file</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</span><span class='line'>          <span class="nx">fmt</span><span class="p">.</span><span class="nx">Fprintf</span><span class="p">(</span><span class="nx">w</span><span class="p">,</span> <span class="s">&quot;%v&quot;</span><span class="p">,</span> <span class="nx">handler</span><span class="p">.</span><span class="nx">Header</span><span class="p">)</span>
+</span><span class='line'>      <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;value=%s\n&quot;</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nx">FormValue</span><span class="p">(</span><span class="s">&quot;token&quot;</span><span class="p">))</span>
+</span><span class='line'>          <span class="nx">f</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">OpenFile</span><span class="p">(</span><span class="s">&quot;./test/&quot;</span><span class="o">+</span><span class="nx">handler</span><span class="p">.</span><span class="nx">Filename</span><span class="p">,</span> <span class="nx">os</span><span class="p">.</span><span class="nx">O_WRONLY</span><span class="p">|</span><span class="nx">os</span><span class="p">.</span><span class="nx">O_CREATE</span><span class="p">,</span> <span class="mo">0666</span><span class="p">)</span>
+</span><span class='line'>          <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>              <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>              <span class="k">return</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>          <span class="k">defer</span> <span class="nx">f</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</span><span class='line'>          <span class="nx">io</span><span class="p">.</span><span class="nx">Copy</span><span class="p">(</span><span class="nx">f</span><span class="p">,</span> <span class="nx">file</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And the template above, upload.gtpl looks like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'> <span class="nt">&lt;html&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;head&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;title&gt;</span>Upload file<span class="nt">&lt;/title&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/head&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;body&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;form</span> <span class="na">enctype=</span><span class="s">&quot;multipart/form-data&quot;</span> <span class="na">action=</span><span class="s">&quot;http://127.0.0.1:9090/upload&quot;</span> <span class="na">method=</span><span class="s">&quot;post&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;file&quot;</span> <span class="na">name=</span><span class="s">&quot;uploadfile&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name=</span><span class="s">&quot;token&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;submit&quot;</span> <span class="na">value=</span><span class="s">&quot;upload&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/form&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/body&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/html&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -184,6 +318,10 @@ Stay tuned for Golang Rants :)</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/04/15/vextab-awesomness-for-musical-notiation/">VexTab! Awesomness for Musical Notiation</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/03/01/code-doodling-with-go/">Code Doodling With Go</a>
       </li>
     
@@ -197,10 +335,6 @@ Stay tuned for Golang Rants :)</p>
     
       <li class="post">
         <a href="/blog/2015/02/09/spying-on-files-with-fsnotify/">Spying on Files With Fsnotify</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/07/color-my-world-or-at-least-my-logfiles/">Color My World! Or at Least My Logfiles</a>
       </li>
     
   </ul>
