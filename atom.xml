@@ -4,7 +4,7 @@
   <title><![CDATA[Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-04-15T15:17:06-04:00</updated>
+  <updated>2015-04-15T15:17:57-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -14,11 +14,38 @@
 
   
   <entry>
-    <title type="html"><![CDATA[VexTab! Awesomness for Musical Notiation]]></title>
+    <title type="html"><![CDATA[VexTab! Musical Notiation]]></title>
     <link href="http://rabarar.github.io/blog/2015/04/15/vextab-awesomness-for-musical-notiation/"/>
     <updated>2015-04-15T15:07:08-04:00</updated>
     <id>http://rabarar.github.io/blog/2015/04/15/vextab-awesomness-for-musical-notiation</id>
-    <content type="html"><![CDATA[
+    <content type="html"><![CDATA[<h2>Using JavaScript to Write Music!</h2>
+
+<h3><a href="http://www.vexflow.com/vextab/">VexFlow, VexTab</a> - Musical Engraving in Javascript</h3>
+
+<p>I&rsquo;m very excited!! I randomly found a great piece of software developed by <strong>Mohit Muthanna Cheppudira</strong> that generates Musical notation and Guitar Tab.</p>
+
+<p>Download the javascript or use the Chrome Extension and you can quickly encode musical notation like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>tabstave
+</span><span class='line'>  notation=true
+</span><span class='line'>  key=A time=4/4
+</span><span class='line'>
+</span><span class='line'>  notes :q =|: (5/2.5/3.7/4) :8 7-5h6/3 ^3^ 5h6-7/5 ^3^ :q 7V/4 |
+</span><span class='line'>  notes :8 t12p7/4 s5s3/4 :8 3s:16:5-7/5 :h p5/4
+</span><span class='line'>  text :w, |#segno, ,|, :hd, , #tr
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And get beautifully formatted musical notation like this:</p>
+
+<p><img src="../images/staff.png" alt="fig 1" /></p>
 ]]></content>
   </entry>
   

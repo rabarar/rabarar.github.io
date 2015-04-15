@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Javascript | Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/blog/categories/javascript/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2015-04-15T15:17:57-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[VexTab! Musical Notiation]]></title>
+    <link href="http://rabarar.github.io/blog/2015/04/15/vextab-awesomness-for-musical-notiation/"/>
+    <updated>2015-04-15T15:07:08-04:00</updated>
+    <id>http://rabarar.github.io/blog/2015/04/15/vextab-awesomness-for-musical-notiation</id>
+    <content type="html"><![CDATA[<h2>Using JavaScript to Write Music!</h2>
+
+<h3><a href="http://www.vexflow.com/vextab/">VexFlow, VexTab</a> - Musical Engraving in Javascript</h3>
+
+<p>I&rsquo;m very excited!! I randomly found a great piece of software developed by <strong>Mohit Muthanna Cheppudira</strong> that generates Musical notation and Guitar Tab.</p>
+
+<p>Download the javascript or use the Chrome Extension and you can quickly encode musical notation like this:</p>
+
+<pre><code>tabstave
+  notation=true
+  key=A time=4/4
+
+  notes :q =|: (5/2.5/3.7/4) :8 7-5h6/3 ^3^ 5h6-7/5 ^3^ :q 7V/4 |
+  notes :8 t12p7/4 s5s3/4 :8 3s:16:5-7/5 :h p5/4
+  text :w, |#segno, ,|, :hd, , #tr
+</code></pre>
+
+<p>And get beautifully formatted musical notation like this:</p>
+
+<p><img src="../images/staff.png" alt="fig 1" /></p>
+]]></content>
+  </entry>
+  
+</feed>
