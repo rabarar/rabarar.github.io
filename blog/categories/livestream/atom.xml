@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Livestream, | Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/blog/categories/livestream/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-07-02T18:13:43-04:00</updated>
+  <updated>2015-07-02T18:16:51-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -18,7 +18,7 @@
     <link href="http://rabarar.github.io/blog/2015/07/02/darkice-and-icecast/"/>
     <updated>2015-07-02T17:49:49-04:00</updated>
     <id>http://rabarar.github.io/blog/2015/07/02/darkice-and-icecast</id>
-    <content type="html"><![CDATA[<p><strong>So</strong> you want to <em>livestream audio</em> from your Pi to the web? Take a look at these two packages: Darkice, and IceCast. Darkice lets you select a sound input to encode and stream to an IceCast server. The server will wrap the audio stream with a nice web-appropriate display to make selecting and playing content with ease.</p>
+    <content type="html"><![CDATA[<p><strong>So</strong> you want to <em>livestream audio</em> from your Pi to the web? Take a look at these two packages: Darkice, and IceCast. Darkice lets you select a sound input to encode and stream to an IceCast server. The server will wrap the audio stream with a nice web-appropriate display to make selecting and playing content easily.</p>
 
 <hr />
 
