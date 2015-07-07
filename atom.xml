@@ -4,7 +4,7 @@
   <title><![CDATA[Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-07-02T18:16:51-04:00</updated>
+  <updated>2015-07-07T11:39:40-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -12,6 +12,187 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Golang Scribbles]]></title>
+    <link href="http://rabarar.github.io/blog/2015/07/07/golang-scribbles/"/>
+    <updated>2015-07-07T11:05:41-04:00</updated>
+    <id>http://rabarar.github.io/blog/2015/07/07/golang-scribbles</id>
+    <content type="html"><![CDATA[<p>So I was <a href="bored.com"><strong>bored</strong></a> an thought I&rsquo;d write some go code to demonstrate a few interesting features in Go!</p>
+
+<p>Take a look at</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>package main
+</span><span class='line'>
+</span><span class='line'>import (
+</span><span class='line'>        "fmt"
+</span><span class='line'>        "sync"
+</span><span class='line'>        "time"
+</span><span class='line'>)
+</span><span class='line'>
+</span><span class='line'>const (
+</span><span class='line'>        MAXFUNCS = 100
+</span><span class='line'>)
+</span><span class='line'>
+</span><span class='line'>func main() {
+</span><span class='line'>
+</span><span class='line'>        var x struct {
+</span><span class='line'>                sync.Mutex
+</span><span class='line'>                y func(int) int
+</span><span class='line'>                z int
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        var xx = make(chan struct {
+</span><span class='line'>                sync.Mutex
+</span><span class='line'>                y func(int) int
+</span><span class='line'>                z int
+</span><span class='line'>        })
+</span><span class='line'>
+</span><span class='line'>        for i := 0; i &lt; MAXFUNCS; i++ {
+</span><span class='line'>                go func(num int) {
+</span><span class='line'>                        x.Lock()
+</span><span class='line'>                        x.y = z
+</span><span class='line'>                        x.z = x.y(42 * num)
+</span><span class='line'>                        fmt.Printf("x.z = %d\n", x.z)
+</span><span class='line'>                        xx &lt;- x
+</span><span class='line'>                        x.Unlock()
+</span><span class='line'>                }(i)
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        to := 0
+</span><span class='line'>        gets := 0
+</span><span class='line'>
+</span><span class='line'>        for {
+</span><span class='line'>                select {
+</span><span class='line'>                case num := &lt;-xx:
+</span><span class='line'>                        to = 0
+</span><span class='line'>                        fmt.Printf("got %d\n", num.z)
+</span><span class='line'>                        gets++
+</span><span class='line'>                default:
+</span><span class='line'>                        fmt.Printf("sleeping...\n")
+</span><span class='line'>                        time.Sleep(1 * time.Second)
+</span><span class='line'>                        to++
+</span><span class='line'>                }
+</span><span class='line'>
+</span><span class='line'>                if to &gt; 5 {
+</span><span class='line'>                        break
+</span><span class='line'>                }
+</span><span class='line'>        }
+</span><span class='line'>
+</span><span class='line'>        fmt.Printf("received %d gets before timeout\n", gets)
+</span><span class='line'>
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>func z(w int) int {
+</span><span class='line'>        return w / 2
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here I want to highlight a few cool concepts in Go:</p>
+
+<ul>
+<li>Anonymous structures</li>
+<li>Bi-directional Channels</li>
+<li>Go Routines</li>
+<li>Non-blocking Channels</li>
+<li>Anonymous fields in structures</li>
+<li>Closures</li>
+</ul>
+
+
+<p>This toy program defines a variable <em>x</em> that is an anonymous struct that has an anonymous field that is a <code>sync.Mutux</code>. Why make this field anonymous? Well, by doing so, we can <code>Lock()</code> and <code>Unlock()</code> the structure without needlessly specifying a fieldname. Simply <code>x.Lock()</code> will lock the Mutux.</p>
+
+<p>Next we create a channel of type that&rsquo;s equivalent to the unnamed stucture type. We do this by mirroring the definition of the unnamed structure in the variable definition.</p>
+
+<p>Now that we&rsquo;ve defined our variables, we create a bunch of go routines using a function closure. We define a function that takes an <code>int</code> as our closure. We then <code>Lock()</code> our variable, assign a function to memeber <code>x.y</code> and call the function passing in the integer and returning the result to <code>x.z</code>. Now that we&rsquo;ve assigned values to <code>xxx</code> we pass it down the channel <code>xx</code>. Lastly we <code>Unlock()</code> the Mutux.</p>
+
+<p>At this point we&rsquo;ve fired up a bunch of go routines, and sent copies of our anonymous struct down the channel.</p>
+
+<p>Next we start and infinite loop (yike!) and check our channel for results in our main go-routine.</p>
+
+<p>The first <code>case</code> in the <code>select</code> checks to see if we&rsquo;ve received a message on the channel. If we have we print out the value that we assigned to our integer field in our anonymous structure and tally the reeipt of a message on the channel.</p>
+
+<p>If we don&rsquo;t receive a message, we default to our <code>default</code> case where we manage a timeout counter, <code>to</code>, After 5 consecutive seconds of not receiving any messages, we break our infinite loop, and report a timeout and display how many messages we received prior to timing out.</p>
+
+<p>What might make this example more interesting is to delay each go routine by a random amount of time and see what if we complete prior to reeiving all of the messages.</p>
+
+<p>Try modifying the function z as follows and see what happens</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>func z(w int) int {
+</span><span class='line'>        time.Sleep(time.Duration(rand.Intn(5)) * time.Second)
+</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This more realistically shows you how the Non-blocking channel works when reading mesages at an unpredictable rate.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[DarkIce and IceCast]]></title>
