@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Scribbling | Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/blog/categories/scribbling/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-07-07T11:39:40-04:00</updated>
+  <updated>2015-07-07T11:42:52-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -22,71 +22,137 @@
 
 <p>Take a look at</p>
 
-<pre><code>package main
-
-import (
-        "fmt"
-        "sync"
-        "time"
-)
-
-const (
-        MAXFUNCS = 100
-)
-
-func main() {
-
-        var x struct {
-                sync.Mutex
-                y func(int) int
-                z int
-        }
-
-        var xx = make(chan struct {
-                sync.Mutex
-                y func(int) int
-                z int
-        })
-
-        for i := 0; i &lt; MAXFUNCS; i++ {
-                go func(num int) {
-                        x.Lock()
-                        x.y = z
-                        x.z = x.y(42 * num)
-                        fmt.Printf("x.z = %d\n", x.z)
-                        xx &lt;- x
-                        x.Unlock()
-                }(i)
-        }
-
-        to := 0
-        gets := 0
-
-        for {
-                select {
-                case num := &lt;-xx:
-                        to = 0
-                        fmt.Printf("got %d\n", num.z)
-                        gets++
-                default:
-                        fmt.Printf("sleeping...\n")
-                        time.Sleep(1 * time.Second)
-                        to++
-                }
-
-                if to &gt; 5 {
-                        break
-                }
-        }
-
-        fmt.Printf("received %d gets before timeout\n", gets)
-
-}
-
-func z(w int) int {
-        return w / 2
-}
-</code></pre>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">main</span><span class="p">&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'>        <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">fmt</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'>        <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">sync</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'>        <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">time</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="p">)&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">const</span> <span class="p">(</span>
+</span><span class='line'>        <span class="nx">MAXFUNCS</span> <span class="p">=</span> <span class="mi">100</span>
+</span><span class='line'><span class="p">)&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">pre</span><span class="p">&gt;&lt;</span><span class="nx">code</span><span class="p">&gt;</span>    <span class="kd">var</span> <span class="nx">x</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+</span><span class='line'>            <span class="nx">y</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="kt">int</span>
+</span><span class='line'>            <span class="nx">z</span> <span class="kt">int</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">xx</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+</span><span class='line'>            <span class="nx">y</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="kt">int</span>
+</span><span class='line'>            <span class="nx">z</span> <span class="kt">int</span>
+</span><span class='line'>    <span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="nx">MAXFUNCS</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">num</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="nx">x</span><span class="p">.</span><span class="nx">Lock</span><span class="p">()</span>
+</span><span class='line'>                    <span class="nx">x</span><span class="p">.</span><span class="nx">y</span> <span class="p">=</span> <span class="nx">z</span>
+</span><span class='line'>                    <span class="nx">x</span><span class="p">.</span><span class="nx">z</span> <span class="p">=</span> <span class="nx">x</span><span class="p">.</span><span class="nx">y</span><span class="p">(</span><span class="mi">42</span> <span class="o">*</span> <span class="nx">num</span><span class="p">)</span>
+</span><span class='line'>                    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;x.z = %d\n&quot;</span><span class="p">,</span> <span class="nx">x</span><span class="p">.</span><span class="nx">z</span><span class="p">)</span>
+</span><span class='line'>                    <span class="nx">xx</span> <span class="o">&amp;</span><span class="nx">lt</span><span class="p">;</span><span class="o">-</span> <span class="nx">x</span>
+</span><span class='line'>                    <span class="nx">x</span><span class="p">.</span><span class="nx">Unlock</span><span class="p">()</span>
+</span><span class='line'>            <span class="p">}(</span><span class="nx">i</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">to</span> <span class="o">:=</span> <span class="mi">0</span>
+</span><span class='line'>    <span class="nx">gets</span> <span class="o">:=</span> <span class="mi">0</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">for</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">select</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">case</span> <span class="nx">num</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">lt</span><span class="p">;</span><span class="o">-</span><span class="nx">xx</span><span class="p">:</span>
+</span><span class='line'>                    <span class="nx">to</span> <span class="p">=</span> <span class="mi">0</span>
+</span><span class='line'>                    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;got %d\n&quot;</span><span class="p">,</span> <span class="nx">num</span><span class="p">.</span><span class="nx">z</span><span class="p">)</span>
+</span><span class='line'>                    <span class="nx">gets</span><span class="o">++</span>
+</span><span class='line'>            <span class="k">default</span><span class="p">:</span>
+</span><span class='line'>                    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;sleeping...\n&quot;</span><span class="p">)</span>
+</span><span class='line'>                    <span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span><span class='line'>                    <span class="nx">to</span><span class="o">++</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">if</span> <span class="nx">to</span> <span class="o">&amp;</span><span class="nx">gt</span><span class="p">;</span> <span class="mi">5</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="k">break</span>
+</span><span class='line'>            <span class="p">}</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;received %d gets before timeout\n&quot;</span><span class="p">,</span> <span class="nx">gets</span><span class="p">)</span>
+</span><span class='line'><span class="p">&lt;</span><span class="o">/</span><span class="nx">code</span><span class="p">&gt;&lt;</span><span class="o">/</span><span class="nx">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">func</span> <span class="nx">z</span><span class="p">(</span><span class="nx">w</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">w</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>Here I want to highlight a few cool concepts in Go:</p>
 
@@ -118,10 +184,13 @@ func z(w int) int {
 
 <p>Try modifying the function z as follows and see what happens</p>
 
-<pre><code>func z(w int) int {
-        time.Sleep(time.Duration(rand.Intn(5)) * time.Second)
-}
-</code></pre>
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="nx">z</span><span class="p">(</span><span class="nx">w</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">(</span><span class="nx">rand</span><span class="p">.</span><span class="nx">Intn</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
 
 <p>This more realistically shows you how the Non-blocking channel works when reading mesages at an unpredictable rate.</p>
 ]]></content>

@@ -170,70 +170,71 @@
 <span class='line-number'>62</span>
 <span class='line-number'>63</span>
 <span class='line-number'>64</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>package main
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">main</span>
 </span><span class='line'>
-</span><span class='line'>import (
-</span><span class='line'>        "fmt"
-</span><span class='line'>        "sync"
-</span><span class='line'>        "time"
-</span><span class='line'>)
+</span><span class='line'><span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'>        <span class="s">&quot;fmt&quot;</span>
+</span><span class='line'>        <span class="s">&quot;sync&quot;</span>
+</span><span class='line'>        <span class="s">&quot;time&quot;</span>
+</span><span class='line'><span class="p">)</span>
 </span><span class='line'>
-</span><span class='line'>const (
-</span><span class='line'>        MAXFUNCS = 100
-</span><span class='line'>)
+</span><span class='line'><span class="kd">const</span> <span class="p">(</span>
+</span><span class='line'>        <span class="nx">MAXFUNCS</span> <span class="p">=</span> <span class="mi">100</span>
+</span><span class='line'><span class="p">)</span>
 </span><span class='line'>
-</span><span class='line'>func main() {
+</span><span class='line'><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
 </span><span class='line'>
-</span><span class='line'>        var x struct {
-</span><span class='line'>                sync.Mutex
-</span><span class='line'>                y func(int) int
-</span><span class='line'>                z int
-</span><span class='line'>        }
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">x</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+</span><span class='line'>                <span class="nx">y</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="kt">int</span>
+</span><span class='line'>                <span class="nx">z</span> <span class="kt">int</span>
+</span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'>        var xx = make(chan struct {
-</span><span class='line'>                sync.Mutex
-</span><span class='line'>                y func(int) int
-</span><span class='line'>                z int
-</span><span class='line'>        })
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">xx</span> <span class="p">=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+</span><span class='line'>                <span class="nx">y</span> <span class="kd">func</span><span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="kt">int</span>
+</span><span class='line'>                <span class="nx">z</span> <span class="kt">int</span>
+</span><span class='line'>        <span class="p">})</span>
 </span><span class='line'>
-</span><span class='line'>        for i := 0; i &lt; MAXFUNCS; i++ {
-</span><span class='line'>                go func(num int) {
-</span><span class='line'>                        x.Lock()
-</span><span class='line'>                        x.y = z
-</span><span class='line'>                        x.z = x.y(42 * num)
-</span><span class='line'>                        fmt.Printf("x.z = %d\n", x.z)
-</span><span class='line'>                        xx &lt;- x
-</span><span class='line'>                        x.Unlock()
-</span><span class='line'>                }(i)
-</span><span class='line'>        }
+</span><span class='line'>        <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">MAXFUNCS</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">num</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="nx">x</span><span class="p">.</span><span class="nx">Lock</span><span class="p">()</span>
+</span><span class='line'>                        <span class="nx">x</span><span class="p">.</span><span class="nx">y</span> <span class="p">=</span> <span class="nx">z</span>
+</span><span class='line'>                        <span class="nx">x</span><span class="p">.</span><span class="nx">z</span> <span class="p">=</span> <span class="nx">x</span><span class="p">.</span><span class="nx">y</span><span class="p">(</span><span class="mi">42</span> <span class="o">*</span> <span class="nx">num</span><span class="p">)</span>
+</span><span class='line'>                        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;x.z = %d\n&quot;</span><span class="p">,</span> <span class="nx">x</span><span class="p">.</span><span class="nx">z</span><span class="p">)</span>
+</span><span class='line'>                        <span class="nx">xx</span> <span class="o">&lt;-</span> <span class="nx">x</span>
+</span><span class='line'>                        <span class="nx">x</span><span class="p">.</span><span class="nx">Unlock</span><span class="p">()</span>
+</span><span class='line'>                <span class="p">}(</span><span class="nx">i</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'>        to := 0
-</span><span class='line'>        gets := 0
+</span><span class='line'>        <span class="nx">to</span> <span class="o">:=</span> <span class="mi">0</span>
+</span><span class='line'>        <span class="nx">gets</span> <span class="o">:=</span> <span class="mi">0</span>
 </span><span class='line'>
-</span><span class='line'>        for {
-</span><span class='line'>                select {
-</span><span class='line'>                case num := &lt;-xx:
-</span><span class='line'>                        to = 0
-</span><span class='line'>                        fmt.Printf("got %d\n", num.z)
-</span><span class='line'>                        gets++
-</span><span class='line'>                default:
-</span><span class='line'>                        fmt.Printf("sleeping...\n")
-</span><span class='line'>                        time.Sleep(1 * time.Second)
-</span><span class='line'>                        to++
-</span><span class='line'>                }
+</span><span class='line'>        <span class="k">for</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">select</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">case</span> <span class="nx">num</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">xx</span><span class="p">:</span>
+</span><span class='line'>                        <span class="nx">to</span> <span class="p">=</span> <span class="mi">0</span>
+</span><span class='line'>                        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;got %d\n&quot;</span><span class="p">,</span> <span class="nx">num</span><span class="p">.</span><span class="nx">z</span><span class="p">)</span>
+</span><span class='line'>                        <span class="nx">gets</span><span class="o">++</span>
+</span><span class='line'>                <span class="k">default</span><span class="p">:</span>
+</span><span class='line'>                        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;sleeping...\n&quot;</span><span class="p">)</span>
+</span><span class='line'>                        <span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span><span class='line'>                        <span class="nx">to</span><span class="o">++</span>
+</span><span class='line'>                <span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'>                if to &gt; 5 {
-</span><span class='line'>                        break
-</span><span class='line'>                }
-</span><span class='line'>        }
+</span><span class='line'>                <span class="k">if</span> <span class="nx">to</span> <span class="p">&gt;</span> <span class="mi">5</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="k">break</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'>        fmt.Printf("received %d gets before timeout\n", gets)
+</span><span class='line'>        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;received %d gets before timeout\n&quot;</span><span class="p">,</span> <span class="nx">gets</span><span class="p">)</span>
 </span><span class='line'>
-</span><span class='line'>}
+</span><span class='line'><span class="p">}</span>
 </span><span class='line'>
-</span><span class='line'>func z(w int) int {
-</span><span class='line'>        return w / 2
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</span><span class='line'><span class="kd">func</span> <span class="nx">z</span><span class="p">(</span><span class="nx">w</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">w</span> <span class="o">/</span> <span class="mi">2</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Here I want to highlight a few cool concepts in Go:</p>
@@ -269,9 +270,10 @@
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>func z(w int) int {
-</span><span class='line'>        time.Sleep(time.Duration(rand.Intn(5)) * time.Second)
-</span><span class='line'>}</span></code></pre></td></tr></table></div></figure>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="nx">z</span><span class="p">(</span><span class="nx">w</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">(</span><span class="nx">rand</span><span class="p">.</span><span class="nx">Intn</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
 
 <p>This more realistically shows you how the Non-blocking channel works when reading mesages at an unpredictable rate.</p>
