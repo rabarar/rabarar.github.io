@@ -4,7 +4,7 @@
   <title><![CDATA[Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-07-07T11:42:52-04:00</updated>
+  <updated>2015-07-08T09:29:34-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -18,7 +18,7 @@
     <link href="http://rabarar.github.io/blog/2015/07/07/golang-scribbles/"/>
     <updated>2015-07-07T11:05:41-04:00</updated>
     <id>http://rabarar.github.io/blog/2015/07/07/golang-scribbles</id>
-    <content type="html"><![CDATA[<p>So I was <a href="bored.com"><strong>bored</strong></a> an thought I&rsquo;d write some go code to demonstrate a few interesting features in Go!</p>
+    <content type="html"><![CDATA[<p>So I was <a href="http://bored.com"><strong>bored</strong></a> an thought I&rsquo;d write some go code to demonstrate a few interesting features in Go!</p>
 
 <p>Take a look at</p>
 
@@ -169,30 +169,32 @@
 
 <p>Next we create a channel of type that&rsquo;s equivalent to the unnamed stucture type. We do this by mirroring the definition of the unnamed structure in the variable definition.</p>
 
-<p>Now that we&rsquo;ve defined our variables, we create a bunch of go routines using a function closure. We define a function that takes an <code>int</code> as our closure. We then <code>Lock()</code> our variable, assign a function to memeber <code>x.y</code> and call the function passing in the integer and returning the result to <code>x.z</code>. Now that we&rsquo;ve assigned values to <code>xxx</code> we pass it down the channel <code>xx</code>. Lastly we <code>Unlock()</code> the Mutux.</p>
+<p>Now that we&rsquo;ve defined our variables, we create a bunch of go routines using a function closure. We define a function that takes an <code>int</code> as our closure. We then <code>Lock()</code> our variable, assign a function to memeber <code>x.y</code> and call the function passing in the integer and returning the result to <code>x.z</code>. Now that we&rsquo;ve assigned values to <code>x</code> we pass it down the channel <code>xx</code>. Lastly we <code>Unlock()</code> the Mutux.</p>
 
 <p>At this point we&rsquo;ve fired up a bunch of go routines, and sent copies of our anonymous struct down the channel.</p>
 
-<p>Next we start and infinite loop (yike!) and check our channel for results in our main go-routine.</p>
+<p>Next we start and infinite loop (yikes!) and check our channel for results in our main go-routine.</p>
 
 <p>The first <code>case</code> in the <code>select</code> checks to see if we&rsquo;ve received a message on the channel. If we have we print out the value that we assigned to our integer field in our anonymous structure and tally the reeipt of a message on the channel.</p>
 
 <p>If we don&rsquo;t receive a message, we default to our <code>default</code> case where we manage a timeout counter, <code>to</code>, After 5 consecutive seconds of not receiving any messages, we break our infinite loop, and report a timeout and display how many messages we received prior to timing out.</p>
 
-<p>What might make this example more interesting is to delay each go routine by a random amount of time and see what if we complete prior to reeiving all of the messages.</p>
+<p>What might make this example more interesting is to delay each go routine by a random amount of time and see if our reception of messages completes prior to receiving all of the messages.</p>
 
 <p>Try modifying the function z as follows and see what happens</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
+<span class='line-number'>4</span>
 </pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">func</span> <span class="nx">z</span><span class="p">(</span><span class="nx">w</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
 </span><span class='line'>        <span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">(</span><span class="nx">rand</span><span class="p">.</span><span class="nx">Intn</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span> <span class="o">*</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">w</span><span class="o">/</span><span class="mi">2</span>
 </span><span class='line'><span class="p">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This more realistically shows you how the Non-blocking channel works when reading mesages at an unpredictable rate.</p>
+<p>This more realistically demonstrates how the Non-blocking channel works when reading mesages at an unpredictable rate.</p>
 ]]></content>
   </entry>
   
