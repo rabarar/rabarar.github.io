@@ -9,19 +9,7 @@
   <meta name="author" content="Rob Baruch">
 
   
-  <meta name="description" content="So I was bored an thought I&rsquo;d write some go code to demonstrate a few interesting features in Go! Take a look at 1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13 &hellip;">
+  <meta name="description" content="Golang packages &ldquo;go/parser&rdquo; and &ldquo;go/ast&rdquo; Golang Parsing Golang: Included as part of the built-in golang packages are &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,6 +65,76 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/08/17/golang-on-golang/">Golang on Golang</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-08-17T10:41:00-04:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>10:41 am</span></time>
+        
+           | <a href="/blog/2015/08/17/golang-on-golang/#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io/blog/2015/08/17/golang-on-golang/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>Golang packages &ldquo;go/parser&rdquo; and &ldquo;go/ast&rdquo;</h3>
+
+<h5>Golang Parsing Golang:</h5>
+
+<p>Included as part of the built-in golang packages are libraries that provide for programatic parsing and inspecting of golang source code.</p>
+
+<p>The two key packages are <code>go/parser</code> and <code>go/ast</code></p>
+
+<p>Let&rsquo;s take a look Parsing process. To start, we must create an Abstract Syntax Tree (AST). Next, we can Parse a source file (or string), which upon success returns a pointer to and AST, <code>*ast.File</code>. All the meat is inside the <code>ast.File</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="c1">// Create the AST by parsing src.</span>
+</span><span class='line'><span class="nx">fset</span> <span class="o">:=</span> <span class="nx">token</span><span class="p">.</span><span class="nx">NewFileSet</span><span class="p">()</span> <span class="c1">// positions are relative to fset</span>
+</span><span class='line'><span class="nx">f</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">parser</span><span class="p">.</span><span class="nx">ParseFile</span><span class="p">(</span><span class="nx">fset</span><span class="p">,</span> <span class="s">&quot;src.go&quot;</span><span class="p">,</span> <span class="nx">src</span><span class="p">,</span> <span class="nx">parser</span><span class="p">.</span><span class="nx">ParseComments</span><span class="p">)</span>
+</span><span class='line'><span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nb">panic</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we can look at different aspects within the parse. For example, if we want to see what imports are included in the source file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="c1">// Print the imports from the file&#39;s AST.</span>
+</span><span class='line'>  <span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">s</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">f</span><span class="p">.</span><span class="nx">Imports</span> <span class="p">{</span>
+</span><span class='line'>      <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">s</span><span class="p">.</span><span class="nx">Path</span><span class="p">.</span><span class="nx">Value</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Lots of opportunities to parse through and look for declarations, functions, specific language mechanisms, expressions, etc. The opportunities are virtually limitless!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1167,46 +1225,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/01/03/mongodb-and-go/">MongoDB and Go!</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-01-03T15:15:24-05:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>3:15 pm</span></time>
-        
-           | <a href="/blog/2015/01/03/mongodb-and-go/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/01/03/mongodb-and-go/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>MongoDB and Go, a pair meant to be together!</p>
-
-<p>I&rsquo;ve recently been working on a start-up that&rsquo;s afforded me the need to get better acquainted with Mongodb and Go. Quickly working with these two technologies, one feels that they were meant for each other. Throw in the json package and you&rsquo;re cooking with Gasoline!</p>
-
-<p>The fun begins when you go wild with the use of map[string]interface{} and []map[string]interface{}. At first glance to the noob, these are daunting looking type definitions. But with a little experimenting to get you legs underneath you, you&rsquo;ll find that you coudn&rsquo;t live without these guys! And for good measure, their big brother, interface{}, is pretty handy too when you want to generically throw these guys around and inspect them through Go&rsquo;s reflect package to see what type you&rsquo;re dealing with at runtime.</p>
-
-<p>Here&rsquo;s the <a href="http://labix.org/mgo">driver</a> that I find works nicely with mongodb</p>
-
-<p>More later&hellip;</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -1222,6 +1240,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/08/17/golang-on-golang/">Golang on Golang</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/07/07/golang-scribbles/">Golang Scribbles</a>
       </li>
     
@@ -1235,10 +1257,6 @@
     
       <li class="post">
         <a href="/blog/2015/03/01/code-doodling-with-go/">Code Doodling With Go</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/22/goofing-around-with-atom/">Goofing Around With Atom</a>
       </li>
     
   </ul>

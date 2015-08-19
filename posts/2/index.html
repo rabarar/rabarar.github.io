@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Baruch">
 
   
-  <meta name="description" content="Building web services with Go is pretty straight-forward. See the godocs for http to see how to write both client and server code. With a little more &hellip;">
+  <meta name="description" content="MongoDB and Go, a pair meant to be together! I&rsquo;ve recently been working on a start-up that&rsquo;s afforded me the need to get better &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,46 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/01/03/mongodb-and-go/">MongoDB and Go!</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-01-03T15:15:24-05:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>3</span><span class='date-suffix'>rd</span>, <span class='date-year'>2015</span></span> <span class='time'>3:15 pm</span></time>
+        
+           | <a href="/blog/2015/01/03/mongodb-and-go/#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io/blog/2015/01/03/mongodb-and-go/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>MongoDB and Go, a pair meant to be together!</p>
+
+<p>I&rsquo;ve recently been working on a start-up that&rsquo;s afforded me the need to get better acquainted with Mongodb and Go. Quickly working with these two technologies, one feels that they were meant for each other. Throw in the json package and you&rsquo;re cooking with Gasoline!</p>
+
+<p>The fun begins when you go wild with the use of map[string]interface{} and []map[string]interface{}. At first glance to the noob, these are daunting looking type definitions. But with a little experimenting to get you legs underneath you, you&rsquo;ll find that you coudn&rsquo;t live without these guys! And for good measure, their big brother, interface{}, is pretty handy too when you want to generically throw these guys around and inspect them through Go&rsquo;s reflect package to see what type you&rsquo;re dealing with at runtime.</p>
+
+<p>Here&rsquo;s the <a href="http://labix.org/mgo">driver</a> that I find works nicely with mongodb</p>
+
+<p>More later&hellip;</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -410,6 +450,10 @@ Stay tuned for Golang Rants :)</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/08/17/golang-on-golang/">Golang on Golang</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/07/07/golang-scribbles/">Golang Scribbles</a>
       </li>
     
@@ -423,10 +467,6 @@ Stay tuned for Golang Rants :)</p>
     
       <li class="post">
         <a href="/blog/2015/03/01/code-doodling-with-go/">Code Doodling With Go</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/02/22/goofing-around-with-atom/">Goofing Around With Atom</a>
       </li>
     
   </ul>
