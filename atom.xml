@@ -4,7 +4,7 @@
   <title><![CDATA[Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-08-19T12:03:50-04:00</updated>
+  <updated>2015-08-19T12:08:50-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -57,6 +57,8 @@
 
 
 <p>Lots of opportunities to parse through and look for declarations, functions, specific language mechanisms, expressions, etc. The opportunities are virtually limitless!</p>
+
+<p>There&rsquo;s a ton of reflection at play in this package. You&rsquo;ll need to inspect and assert to look at the specific elements within a structure. A close read of the AST Print is a worthwhile exercise :)</p>
 ]]></content>
   </entry>
   
