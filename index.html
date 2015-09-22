@@ -182,34 +182,47 @@
 
 <p> You may need to setup your audio port on the Jetson</p>
 
-<p> &#8220;`
- amixer cset name=&ldquo;Stereo ADC MIXL ADC2 Switch&rdquo; 0
-amixer cset name=&ldquo;Stereo ADC MIXR ADC2 Switch&rdquo; 0
-amixer cset name=&ldquo;Int Mic Switch&rdquo; 0
-amixer cset name=&ldquo;ADC Capture Switch&rdquo; 1
-amixer cset name=&ldquo;RECMIXL BST1 Switch&rdquo; 0
-amixer cset name=&ldquo;RECMIXR BST1 Switch&rdquo; 0
-amixer cset name=&ldquo;RECMIXL BST2 Switch&rdquo; 1
-amixer cset name=&ldquo;RECMIXR BST2 Switch&rdquo; 1
-amixer cset name=&ldquo;Stereo ADC L1 Mux&rdquo; &ldquo;ADC&rdquo;
-amixer cset name=&ldquo;Stereo ADC R1 Mux&rdquo; &ldquo;ADC&rdquo;
-amixer cset name=&ldquo;Stereo ADC MIXL ADC1 Switch&rdquo; 1
-amixer cset name=&ldquo;Stereo ADC MIXR ADC1 Switch&rdquo; 1
-amixer cset name=&ldquo;Stereo ADC MIXL ADC2 Switch&rdquo; 0
-amixer cset name=&ldquo;Stereo ADC MIXR ADC2 Switch&rdquo; 0
-amixer cset name=&ldquo;IN1 Mode Control&rdquo; &ldquo;Single ended&rdquo;
-amixer cset name=&ldquo;IN2 Mode Control&rdquo; &ldquo;Single ended&rdquo;
-amixer cset name=&ldquo;Mic Jack Switch&rdquo; 1</p>
-
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>
-</span><span class='line'>and then save the settings using:
-</span></code></pre></td></tr></table></div></figure>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'> amixer cset name="Stereo ADC MIXL ADC2 Switch" 0
+</span><span class='line'>amixer cset name="Stereo ADC MIXR ADC2 Switch" 0
+</span><span class='line'>amixer cset name="Int Mic Switch" 0
+</span><span class='line'>amixer cset name="ADC Capture Switch" 1
+</span><span class='line'>amixer cset name="RECMIXL BST1 Switch" 0
+</span><span class='line'>amixer cset name="RECMIXR BST1 Switch" 0
+</span><span class='line'>amixer cset name="RECMIXL BST2 Switch" 1
+</span><span class='line'>amixer cset name="RECMIXR BST2 Switch" 1
+</span><span class='line'>amixer cset name="Stereo ADC L1 Mux" "ADC"
+</span><span class='line'>amixer cset name="Stereo ADC R1 Mux" "ADC"
+</span><span class='line'>amixer cset name="Stereo ADC MIXL ADC1 Switch" 1
+</span><span class='line'>amixer cset name="Stereo ADC MIXR ADC1 Switch" 1
+</span><span class='line'>amixer cset name="Stereo ADC MIXL ADC2 Switch" 0
+</span><span class='line'>amixer cset name="Stereo ADC MIXR ADC2 Switch" 0
+</span><span class='line'>amixer cset name="IN1 Mode Control" "Single ended"
+</span><span class='line'>amixer cset name="IN2 Mode Control" "Single ended"
+</span><span class='line'>amixer cset name="Mic Jack Switch" 1</span></code></pre></td></tr></table></div></figure>
 
 
-<p>alsactl store
-&#8220;`</p>
+<p>and then save the settings using:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>alsactl store</span></code></pre></td></tr></table></div></figure>
+
 
 <p> It&rsquo;s that easy!</p>
 

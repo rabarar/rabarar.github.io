@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Linux | Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-09-22T14:30:41-04:00</updated>
+  <updated>2015-09-22T14:35:02-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -77,7 +77,7 @@ localDumpFile = recording.mp3    # Record also to a file
 
 <p> You may need to setup your audio port on the Jetson</p>
 
-<pre><code class="`"> amixer cset name="Stereo ADC MIXL ADC2 Switch" 0
+<pre><code> amixer cset name="Stereo ADC MIXL ADC2 Switch" 0
 amixer cset name="Stereo ADC MIXR ADC2 Switch" 0
 amixer cset name="Int Mic Switch" 0
 amixer cset name="ADC Capture Switch" 1
