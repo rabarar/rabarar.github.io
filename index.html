@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Baruch">
 
   
-  <meta name="description" content="Golang packages &ldquo;go/parser&rdquo; and &ldquo;go/ast&rdquo; Golang Parsing Golang: Included as part of the built-in golang packages are &hellip;">
+  <meta name="description" content="Jetson TK-1 - Embedded SBC SuperComputer Power for Pennies Okay, so everyone has a blast playing with the &lt; $50 raspberry pi, but what if you take &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,174 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/09/22/jetson-tk-1-nvidia-l4t-linux-platform/">Jetson TK-1 Nvidia L4T Linux Platform</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-09-22T13:44:06-04:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>1:44 pm</span></time>
+        
+           | <a href="/blog/2015/09/22/jetson-tk-1-nvidia-l4t-linux-platform/#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io/blog/2015/09/22/jetson-tk-1-nvidia-l4t-linux-platform/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>Jetson TK-1 - Embedded SBC SuperComputer Power for Pennies</h2>
+
+<p><img src="http://jetsonhacks.com/wp-content/uploads/2014/06/DevBoard2-300x199.png" title="Jetson TK-1" alt="jetsonhacks" /></p>
+
+<p>Okay, so everyone has a blast playing with the &lt; $50 raspberry pi, but what if you take it up a notch. I mean drop a few extra bucks (more like $160 extra) and you can have some serious power in a small little footprint. The Jetson TK-1 is a Kepler GPU with <strong>192 cuda cores</strong> and <strong>4-Plus-1 quad-core ARM Cortex A15 CPU</strong>. That&rsquo;s a lotta power for $192 (retail). But wait, there&rsquo;s more. It comes with 1Ge ethernet connector, 2Gb ram, 16Gb eMMC memory, USB, Audio, SATA, HDMI, and RS-232 serial port (old school).</p>
+
+<p>The board supports a derivative of ubuntu 14.04 called <a href="https://developer.nvidia.com/embedded/linux-tegra">L4T</a>. Additionally, there is support for Cuda 6.5, OpenCV, and OpenGL, as well as samples - <a href="https://developer.nvidia.com/gameworks-opengl-samples">NVIDIA GameWorks OpenGL Samples 2.11</a>. Definitely checkout the floating <a href="http://docs.nvidia.com/gameworks/index.html#gameworkslibrary/graphicssamples/opengl_samples/hdrsample.htm">Teapot!</a>.</p>
+
+<p>Aside from all the graphic power offered by this platform. You can use it as a streaming server too. Real-time mp3 streaming is easy as pi! Er, easy as <strong>Jetson</strong>!!</p>
+
+<h2>Darkice &amp; Icecast2</h2>
+
+<p>I thought I&rsquo;d see how easy it was to setup Darkice and stream live audio from the mic on the Tegra to my Icecast2 server.</p>
+
+<p>To build the source we first need to install all the dependencies:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get --no-install-recommends install build-essential devscripts autotools-dev fakeroot dpkg-dev debhelper autotools-dev dh-make quilt ccache libsamplerate0-dev libpulse-dev libaudio-dev lame libjack-jackd2-dev libasound2-dev libtwolame-dev libfaad-dev libflac-dev libmp4v2-dev libshout3-dev libmp3lame-dev</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It took less than a 5 minutes to get it set up! Download the Darkice source and build (configure) it with the <code>--with-alsa and --with-alsa-prefix</code>, and <code>--with-lame, and --with-lame-prefix</code>, both pointing to the library directory for the shared libraries respectivly. After configuring and Making the darkice binary, you&rsquo;ll need to setup a <code>/etc/darkice.cfg</code> file.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'># see the darkice.cfg man page for details
+</span><span class='line'>
+</span><span class='line'># this section describes general aspects of the live streaming session
+</span><span class='line'>[general]
+</span><span class='line'>duration      = 0                # duration of encoding, in seconds. 0 means forever
+</span><span class='line'>bufferSecs    = 5                # size of internal slip buffer, in seconds
+</span><span class='line'>reconnect     = yes              # reconnect to the server(s) if disconnected
+</span><span class='line'>
+</span><span class='line'># this section describes the audio input that will be streamed
+</span><span class='line'>[input]
+</span><span class='line'>device        = hw:1,0           # Alsa soundcard device for the audio input
+</span><span class='line'>sampleRate    = 44100            # sample rate in Hz. try 11025, 22050 or 44100
+</span><span class='line'>bitsPerSample = 16               # bits per sample. try 16
+</span><span class='line'>channel       = 1                # channels. 1 = mono, 2 = stereo
+</span><span class='line'>
+</span><span class='line'># this section describes a streaming connection to an IceCast2 server
+</span><span class='line'># there may be up to 8 of these sections, named [icecast2-0] ... [icecast2-7]
+</span><span class='line'># these can be mixed with [icecast-x] and [shoutcast-x] sections
+</span><span class='line'>[icecast2-0]
+</span><span class='line'>bitrateMode   = vbr              # variable bit rate
+</span><span class='line'>format        = mp3              # format of the stream: mp3
+</span><span class='line'>quality       = 0.6              # quality of the stream sent to the server
+</span><span class='line'>server        = localhost        # host name of the server
+</span><span class='line'>port          = 8000             # port of the IceCast2 server, usually 8000
+</span><span class='line'>password      = SOURCE_PASSWORD  # source password to the IceCast2 server
+</span><span class='line'>mountPoint    = raspi         # mount point of this stream on the IceCast2 server
+</span><span class='line'>name          = RasPi            # name of the stream
+</span><span class='line'>description   = DarkIce on RasPi # description of the stream
+</span><span class='line'>url           = http://localhost # URL related to the stream
+</span><span class='line'>genre         = my genre         # genre of the stream
+</span><span class='line'>public        = no               # advertise this stream?
+</span><span class='line'>localDumpFile = recording.mp3    # Record also to a file</span></code></pre></td></tr></table></div></figure>
+
+
+<p> I set the device name to <code>pulse</code>. Fire it up and throw it in the background and you should see a stream registered on your Icecast2 server!</p>
+
+<p> You may need to setup your audio port on the Jetson</p>
+
+<p> &#8220;`
+ amixer cset name=&ldquo;Stereo ADC MIXL ADC2 Switch&rdquo; 0
+amixer cset name=&ldquo;Stereo ADC MIXR ADC2 Switch&rdquo; 0
+amixer cset name=&ldquo;Int Mic Switch&rdquo; 0
+amixer cset name=&ldquo;ADC Capture Switch&rdquo; 1
+amixer cset name=&ldquo;RECMIXL BST1 Switch&rdquo; 0
+amixer cset name=&ldquo;RECMIXR BST1 Switch&rdquo; 0
+amixer cset name=&ldquo;RECMIXL BST2 Switch&rdquo; 1
+amixer cset name=&ldquo;RECMIXR BST2 Switch&rdquo; 1
+amixer cset name=&ldquo;Stereo ADC L1 Mux&rdquo; &ldquo;ADC&rdquo;
+amixer cset name=&ldquo;Stereo ADC R1 Mux&rdquo; &ldquo;ADC&rdquo;
+amixer cset name=&ldquo;Stereo ADC MIXL ADC1 Switch&rdquo; 1
+amixer cset name=&ldquo;Stereo ADC MIXR ADC1 Switch&rdquo; 1
+amixer cset name=&ldquo;Stereo ADC MIXL ADC2 Switch&rdquo; 0
+amixer cset name=&ldquo;Stereo ADC MIXR ADC2 Switch&rdquo; 0
+amixer cset name=&ldquo;IN1 Mode Control&rdquo; &ldquo;Single ended&rdquo;
+amixer cset name=&ldquo;IN2 Mode Control&rdquo; &ldquo;Single ended&rdquo;
+amixer cset name=&ldquo;Mic Jack Switch&rdquo; 1</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>
+</span><span class='line'>and then save the settings using:
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>alsactl store
+&#8220;`</p>
+
+<p> It&rsquo;s that easy!</p>
+
+<p> Helpful links:</p>
+
+<ul>
+<li><a href="http://elinux.org/Jetson_TK1">eLinux Tegra</a></li>
+<li><a href="http://jetsonhacks.com">Jetson Hacks!</a></li>
+<li><a href="https://developer.nvidia.com/jetson-tk1">nVidia Developer for Jetson</a></li>
+<li><a href="http://arrayfire.com/download/">Tegra K1 ArrayFire</a></li>
+</ul>
+
+
+<p> #### Next Up: Jetson TK-1 20-node cluster
+ So, I was impulsive&hellip; I bought 20 of these boards, loaded up the <a href="https://docs.nvidia.com/jetpack-tk1/index.html">JetPack</a> and started to ponder - how I am going to power, connect, and house 20 of these boards.</p>
+
+<p> Aside from stacking up the hardware, I&rsquo;m thinking about the software to glue twenty of these things together too. Want to take advantage of cuda and maybe even mpi&hellip; stay tuned!!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1189,44 +1357,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/01/18/wake-me-up-before-you-logo/">Wake Me Up Before You Logo!</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-01-18T11:54:38-05:00'><span class='date'><span class='date-month'>Jan</span> <span class='date-day'>18</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>11:54 am</span></time>
-        
-           | <a href="/blog/2015/01/18/wake-me-up-before-you-logo/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/01/18/wake-me-up-before-you-logo/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Just for fun, I thought I&rsquo;d play around with <a href="http://www.alancsmith.co.uk/logo/">Alan Smith&rsquo;s ACSLogo</a> for Mac. This great program is a full-featured Logo interpreter that is perfectly suited for teaching basic programming and math concepts to people of all ages.</p>
-
-<p>I&rsquo;ve put together a <a href="https://github.com/rabarar/LogoPlay">repo</a> on github that is a collection of fun and interesting procedures mostly do perform graphically interesting recusive problems. Feel free to add to the collection!</p>
-
-<p>I strongly suggest start by reading the <a href="http://www.alancsmith.co.uk/logo/LogoUserGuide151.pdf">User Guide</a> and the <a href="http://www.alancsmith.co.uk/logo/Logocommandref151.pdf">Command Reference</a> documents to orient yourself to the Logo dialect.</p>
-
-<p>Have Fun!</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -1242,6 +1372,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/09/22/jetson-tk-1-nvidia-l4t-linux-platform/">Jetson TK-1 Nvidia L4T Linux Platform</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/08/17/golang-on-golang/">Golang on Golang</a>
       </li>
     
@@ -1255,10 +1389,6 @@
     
       <li class="post">
         <a href="/blog/2015/04/15/vextab-awesomness-for-musical-notiation/">VexTab! Musical Notiation in HTML</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/03/01/code-doodling-with-go/">Code Doodling With Go</a>
       </li>
     
   </ul>

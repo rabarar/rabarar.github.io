@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Audio | Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/blog/categories/audio/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2015-09-22T14:30:41-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Jetson TK-1 Nvidia L4T Linux Platform]]></title>
+    <link href="http://rabarar.github.io/blog/2015/09/22/jetson-tk-1-nvidia-l4t-linux-platform/"/>
+    <updated>2015-09-22T13:44:06-04:00</updated>
+    <id>http://rabarar.github.io/blog/2015/09/22/jetson-tk-1-nvidia-l4t-linux-platform</id>
+    <content type="html"><![CDATA[<h2>Jetson TK-1 - Embedded SBC SuperComputer Power for Pennies</h2>
+
+<p><img src="http://jetsonhacks.com/wp-content/uploads/2014/06/DevBoard2-300x199.png" title="Jetson TK-1" alt="jetsonhacks" /></p>
+
+<p>Okay, so everyone has a blast playing with the &lt; $50 raspberry pi, but what if you take it up a notch. I mean drop a few extra bucks (more like $160 extra) and you can have some serious power in a small little footprint. The Jetson TK-1 is a Kepler GPU with <strong>192 cuda cores</strong> and <strong>4-Plus-1 quad-core ARM Cortex A15 CPU</strong>. That&rsquo;s a lotta power for $192 (retail). But wait, there&rsquo;s more. It comes with 1Ge ethernet connector, 2Gb ram, 16Gb eMMC memory, USB, Audio, SATA, HDMI, and RS-232 serial port (old school).</p>
+
+<p>The board supports a derivative of ubuntu 14.04 called <a href="https://developer.nvidia.com/embedded/linux-tegra">L4T</a>. Additionally, there is support for Cuda 6.5, OpenCV, and OpenGL, as well as samples - <a href="https://developer.nvidia.com/gameworks-opengl-samples">NVIDIA GameWorks OpenGL Samples 2.11</a>. Definitely checkout the floating <a href="http://docs.nvidia.com/gameworks/index.html#gameworkslibrary/graphicssamples/opengl_samples/hdrsample.htm">Teapot!</a>.</p>
+
+<p>Aside from all the graphic power offered by this platform. You can use it as a streaming server too. Real-time mp3 streaming is easy as pi! Er, easy as <strong>Jetson</strong>!!</p>
+
+<h2>Darkice &amp; Icecast2</h2>
+
+<p>I thought I&rsquo;d see how easy it was to setup Darkice and stream live audio from the mic on the Tegra to my Icecast2 server.</p>
+
+<p>To build the source we first need to install all the dependencies:</p>
+
+<pre><code>sudo apt-get --no-install-recommends install build-essential devscripts autotools-dev fakeroot dpkg-dev debhelper autotools-dev dh-make quilt ccache libsamplerate0-dev libpulse-dev libaudio-dev lame libjack-jackd2-dev libasound2-dev libtwolame-dev libfaad-dev libflac-dev libmp4v2-dev libshout3-dev libmp3lame-dev
+</code></pre>
+
+<p>It took less than a 5 minutes to get it set up! Download the Darkice source and build (configure) it with the <code>--with-alsa and --with-alsa-prefix</code>, and <code>--with-lame, and --with-lame-prefix</code>, both pointing to the library directory for the shared libraries respectivly. After configuring and Making the darkice binary, you&rsquo;ll need to setup a <code>/etc/darkice.cfg</code> file.</p>
+
+<pre><code># see the darkice.cfg man page for details
+
+# this section describes general aspects of the live streaming session
+[general]
+duration      = 0                # duration of encoding, in seconds. 0 means forever
+bufferSecs    = 5                # size of internal slip buffer, in seconds
+reconnect     = yes              # reconnect to the server(s) if disconnected
+
+# this section describes the audio input that will be streamed
+[input]
+device        = hw:1,0           # Alsa soundcard device for the audio input
+sampleRate    = 44100            # sample rate in Hz. try 11025, 22050 or 44100
+bitsPerSample = 16               # bits per sample. try 16
+channel       = 1                # channels. 1 = mono, 2 = stereo
+
+# this section describes a streaming connection to an IceCast2 server
+# there may be up to 8 of these sections, named [icecast2-0] ... [icecast2-7]
+# these can be mixed with [icecast-x] and [shoutcast-x] sections
+[icecast2-0]
+bitrateMode   = vbr              # variable bit rate
+format        = mp3              # format of the stream: mp3
+quality       = 0.6              # quality of the stream sent to the server
+server        = localhost        # host name of the server
+port          = 8000             # port of the IceCast2 server, usually 8000
+password      = SOURCE_PASSWORD  # source password to the IceCast2 server
+mountPoint    = raspi         # mount point of this stream on the IceCast2 server
+name          = RasPi            # name of the stream
+description   = DarkIce on RasPi # description of the stream
+url           = http://localhost # URL related to the stream
+genre         = my genre         # genre of the stream
+public        = no               # advertise this stream?
+localDumpFile = recording.mp3    # Record also to a file
+</code></pre>
+
+<p> I set the device name to <code>pulse</code>. Fire it up and throw it in the background and you should see a stream registered on your Icecast2 server!</p>
+
+<p> You may need to setup your audio port on the Jetson</p>
+
+<pre><code class="`"> amixer cset name="Stereo ADC MIXL ADC2 Switch" 0
+amixer cset name="Stereo ADC MIXR ADC2 Switch" 0
+amixer cset name="Int Mic Switch" 0
+amixer cset name="ADC Capture Switch" 1
+amixer cset name="RECMIXL BST1 Switch" 0
+amixer cset name="RECMIXR BST1 Switch" 0
+amixer cset name="RECMIXL BST2 Switch" 1
+amixer cset name="RECMIXR BST2 Switch" 1
+amixer cset name="Stereo ADC L1 Mux" "ADC"
+amixer cset name="Stereo ADC R1 Mux" "ADC"
+amixer cset name="Stereo ADC MIXL ADC1 Switch" 1
+amixer cset name="Stereo ADC MIXR ADC1 Switch" 1
+amixer cset name="Stereo ADC MIXL ADC2 Switch" 0
+amixer cset name="Stereo ADC MIXR ADC2 Switch" 0
+amixer cset name="IN1 Mode Control" "Single ended"
+amixer cset name="IN2 Mode Control" "Single ended"
+amixer cset name="Mic Jack Switch" 1
+</code></pre>
+
+<p>and then save the settings using:</p>
+
+<pre><code>alsactl store
+</code></pre>
+
+<p> It&rsquo;s that easy!</p>
+
+<p> Helpful links:</p>
+
+<ul>
+<li><a href="http://elinux.org/Jetson_TK1">eLinux Tegra</a></li>
+<li><a href="http://jetsonhacks.com">Jetson Hacks!</a></li>
+<li><a href="https://developer.nvidia.com/jetson-tk1">nVidia Developer for Jetson</a></li>
+<li><a href="http://arrayfire.com/download/">Tegra K1 ArrayFire</a></li>
+</ul>
+
+
+<p> #### Next Up: Jetson TK-1 20-node cluster
+ So, I was impulsive&hellip; I bought 20 of these boards, loaded up the <a href="https://docs.nvidia.com/jetpack-tk1/index.html">JetPack</a> and started to ponder - how I am going to power, connect, and house 20 of these boards.</p>
+
+<p> Aside from stacking up the hardware, I&rsquo;m thinking about the software to glue twenty of these things together too. Want to take advantage of cuda and maybe even mpi&hellip; stay tuned!!</p>
+]]></content>
+  </entry>
+  
+</feed>
