@@ -235,7 +235,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>So what&rsquo;s going on here? First we create a struct that will contain our dynmaically allocated memory, <strong>CFoo</strong>. Inside of <strong>CFoo</strong> I threw in a Mutex, a <strong>name</strong>, a <strong>allocCnt</strong> to allow us to track the allocations and releases of the memory, and lastly <strong>memory</strong> of type <code>`unsafe.Pointer</code> that will point to our dnyamically allocated object. The mutex and the count are soley illustrative and aren&rsquo;t likely needed in practice.</p>
+<p>So what&rsquo;s going on here? First we create a struct that will contain our dynmaically allocated memory, <strong>CFoo</strong>. Inside of <strong>CFoo</strong> I threw in a Mutex, a <strong>name</strong>, a <strong>allocCnt</strong> to allow us to track the allocations and releases of the memory, and lastly <strong>memory</strong> of type <code>unsafe.Pointer</code> that will point to our dnyamically allocated object. The mutex and the count are soley illustrative and aren&rsquo;t likely needed in practice.</p>
 
 <p>Our <strong>CFoo</strong> struct contains a function <code>`alloc</code> that will do two important things:</p>
 
