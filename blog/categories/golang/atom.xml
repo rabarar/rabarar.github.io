@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Golang, | Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/blog/categories/golang/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-09-22T14:38:31-04:00</updated>
+  <updated>2015-09-29T13:12:29-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -12,6 +12,165 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Cgo and Destructors for Managing Allocated Memory in Go]]></title>
+    <link href="http://rabarar.github.io/blog/2015/09/29/cgo-and-destructors-for-managing-allocated-memory-in-go/"/>
+    <updated>2015-09-29T12:55:59-04:00</updated>
+    <id>http://rabarar.github.io/blog/2015/09/29/cgo-and-destructors-for-managing-allocated-memory-in-go</id>
+    <content type="html"><![CDATA[<h2>Managing memory allocation when using Cgo</h2>
+
+<p>A common challenge when creating Cgo and Golang code that needs to manage dynamically created objects is memory management. How do you create an objet and <strong>ensure</strong> that the object isn&rsquo;t leaked. The garbage collector will help manage natural native golang objects that are no longer needed once the scope is exited. But how can we do the same thing when we create dynamic memory objects with Cgo?</p>
+
+<p>Turns out the answer lives at the intersection of <code>runtime.SetFinalizer()</code> and <code>runtime.CG()</code> and a wrapping up the objects in a golang struct.</p>
+
+<p>Here&rsquo;s an example of a golang program that allocates memory in C, and then frees it with a call to the finalizer:</p>
+
+<p><figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">main</span><span class="p">&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="cm">/*&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">&lt;h1&gt;include &amp;lt;stdlib.h&gt;&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">&lt;h1&gt;include &amp;lt;stdio.h&gt;&lt;/h1&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">&lt;p&gt;void &lt;em&gt;foo(void) {</span>
+</span><span class='line'><span class="cm">        static int count= 0;</span>
+</span><span class='line'><span class="cm">        void &lt;/em&gt;thing = (void &lt;em&gt;)malloc(sizeof(int));</span>
+</span><span class='line'><span class="cm">        &lt;/em&gt;((int *)thing) = count++;</span>
+</span><span class='line'><span class="cm">        return thing;</span>
+</span><span class='line'><span class="cm">}&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">&lt;p&gt;*/</span>
+</span><span class='line'><span class="c1">// #cgo LDFLAGS: -L/usr/local/lib -lafcuda</span>
+</span><span class='line'><span class="kn">import</span> <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">C</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'>        <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">fmt</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'>        <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">runtime</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'>        <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">sync</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'>        <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">time</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'>        <span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">unsafe</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="p">)&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">type</span> <span class="nx">CFoo</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+</span><span class='line'>        <span class="nx">name</span>     <span class="kt">string</span>
+</span><span class='line'>        <span class="nx">allocCnt</span> <span class="kt">int</span>
+</span><span class='line'>        <span class="nx">memory</span>   <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span>
+</span><span class='line'><span class="p">}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CFoo</span><span class="p">)</span> <span class="nx">alloc</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">name</span> <span class="p">=</span> <span class="nx">name</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">Lock</span><span class="p">()</span>
+</span><span class='line'>        <span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Unlock</span><span class="p">()</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">allocCnt</span><span class="o">++</span>
+</span><span class='line'>        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">alloc</span><span class="p">[</span><span class="o">%</span><span class="nx">s</span><span class="p">]:</span> <span class="nx">count</span> <span class="p">=</span> <span class="o">%</span><span class="nx">d</span><span class="err">\</span><span class="nx">n</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">allocCnt</span><span class="p">)</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">memory</span> <span class="p">=</span> <span class="nx">C</span><span class="p">.</span><span class="nx">foo</span><span class="p">()</span>
+</span><span class='line'>        <span class="nx">runtime</span><span class="p">.</span><span class="nx">SetFinalizer</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">free</span><span class="p">)</span>
+</span><span class='line'><span class="p">}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">func</span> <span class="nx">free</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CFoo</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">C</span><span class="p">.</span><span class="nx">free</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">memory</span><span class="p">))</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">Lock</span><span class="p">()</span>
+</span><span class='line'>        <span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Unlock</span><span class="p">()</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">allocCnt</span><span class="o">&amp;</span><span class="nx">ndash</span><span class="p">;</span>
+</span><span class='line'>        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">free</span><span class="p">[</span><span class="o">%</span><span class="nx">s</span><span class="p">]:</span> <span class="nx">count</span> <span class="p">=</span> <span class="o">%</span><span class="nx">d</span><span class="err">\</span><span class="nx">n</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">allocCnt</span><span class="p">)</span>
+</span><span class='line'><span class="p">}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">func</span> <span class="nx">Bar</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">c1</span><span class="p">,</span> <span class="nx">c2</span> <span class="nx">CFoo</span><span class="p">&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">pre</span><span class="p">&gt;&lt;</span><span class="nx">code</span><span class="p">&gt;</span>    <span class="nx">c1</span><span class="p">.</span><span class="nx">alloc</span><span class="p">(</span><span class="s">&quot;cfoo&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="nx">c2</span><span class="p">.</span><span class="nx">alloc</span><span class="p">(</span><span class="s">&quot;cbar&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">&lt;</span><span class="o">/</span><span class="nx">code</span><span class="p">&gt;&lt;</span><span class="o">/</span><span class="nx">pre</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;}&lt;</span><span class="o">/</span><span class="nx">p</span><span class="p">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">&lt;</span><span class="nx">p</span><span class="p">&gt;</span><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&amp;</span><span class="nx">lt</span><span class="p">;</span> <span class="mi">3</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">Bar</span><span class="p">()</span>
+</span><span class='line'>                <span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span><span class='line'>                <span class="c1">//runtime.GC()</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="nx">runtime</span><span class="p">.</span><span class="nx">GC</span><span class="p">()</span>
+</span><span class='line'>        <span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span><span class='line'>        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="o">&amp;</span><span class="nx">ldquo</span><span class="p">;</span><span class="nx">done</span><span class="p">.</span><span class="o">&amp;</span><span class="nx">rdquo</span><span class="p">;)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure></p>
+
+<p>So what&rsquo;s going on here? First we create a struct that will contain our dynmaically allocated memory, <strong>CFoo</strong>. Inside of <strong>CFoo</strong> I threw in a Mutex, a <strong>name</strong>, a <strong>allocCnt</strong> to allow us to track the allocations and releases of the memory, and lastly <strong>memory</strong> of type <code>`unsafe.Pointer</code> that will point to our dnyamically allocated object.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Gin and Martini: Go Have Fun With Web Services Frameworks!]]></title>

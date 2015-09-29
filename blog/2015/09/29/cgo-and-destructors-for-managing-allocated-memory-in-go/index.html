@@ -1,0 +1,386 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Cgo and Destructors for Managing Allocated Memory in Go - Rabarar&#39;s Blog</title>
+  <meta name="author" content="Rob Baruch">
+
+  
+  <meta name="description" content="Managing memory allocation when using Cgo A common challenge when creating Cgo and Golang code that needs to manage dynamically created objects is &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://rabarar.github.io/blog/2015/09/29/cgo-and-destructors-for-managing-allocated-memory-in-go">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rabarar\'s Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Rabarar&#39;s Blog</a></h1>
+  
+    <h2>A blogging framework for mild hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rabarar.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Cgo and Destructors for Managing Allocated Memory in Go</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-09-29T12:55:59-04:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:55 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Managing memory allocation when using Cgo</h2>
+
+<p>A common challenge when creating Cgo and Golang code that needs to manage dynamically created objects is memory management. How do you create an objet and <strong>ensure</strong> that the object isn&rsquo;t leaked. The garbage collector will help manage natural native golang objects that are no longer needed once the scope is exited. But how can we do the same thing when we create dynamic memory objects with Cgo?</p>
+
+<p>Turns out the answer lives at the intersection of <code>runtime.SetFinalizer()</code> and <code>runtime.CG()</code> and a wrapping up the objects in a golang struct.</p>
+
+<p>Here&rsquo;s an example of a golang program that allocates memory in C, and then frees it with a call to the finalizer:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">main</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/*</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">#include &lt;stdlib.h&gt;</span>
+</span><span class='line'><span class="cm">#include &lt;stdio.h&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">void *foo(void) {</span>
+</span><span class='line'><span class="cm">        static int count= 0;</span>
+</span><span class='line'><span class="cm">        void *thing = (void *)malloc(sizeof(int));</span>
+</span><span class='line'><span class="cm">        *((int *)thing) = count++;</span>
+</span><span class='line'><span class="cm">        return thing;</span>
+</span><span class='line'><span class="cm">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">*/</span>
+</span><span class='line'><span class="c1">// #cgo LDFLAGS: -L/usr/local/lib -lafcuda</span>
+</span><span class='line'><span class="kn">import</span> <span class="s">&quot;C&quot;</span>
+</span><span class='line'><span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'>        <span class="s">&quot;fmt&quot;</span>
+</span><span class='line'>        <span class="s">&quot;runtime&quot;</span>
+</span><span class='line'>        <span class="s">&quot;sync&quot;</span>
+</span><span class='line'>        <span class="s">&quot;time&quot;</span>
+</span><span class='line'>        <span class="s">&quot;unsafe&quot;</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">type</span> <span class="nx">CFoo</span> <span class="kd">struct</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">sync</span><span class="p">.</span><span class="nx">Mutex</span>
+</span><span class='line'>        <span class="nx">name</span>     <span class="kt">string</span>
+</span><span class='line'>        <span class="nx">allocCnt</span> <span class="kt">int</span>
+</span><span class='line'>        <span class="nx">memory</span>   <span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CFoo</span><span class="p">)</span> <span class="nx">alloc</span><span class="p">(</span><span class="nx">name</span> <span class="kt">string</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">name</span> <span class="p">=</span> <span class="nx">name</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">Lock</span><span class="p">()</span>
+</span><span class='line'>        <span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Unlock</span><span class="p">()</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">allocCnt</span><span class="o">++</span>
+</span><span class='line'>        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;alloc[%s]: count = %d\n&quot;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">allocCnt</span><span class="p">)</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">memory</span> <span class="p">=</span> <span class="nx">C</span><span class="p">.</span><span class="nx">foo</span><span class="p">()</span>
+</span><span class='line'>        <span class="nx">runtime</span><span class="p">.</span><span class="nx">SetFinalizer</span><span class="p">(</span><span class="nx">c</span><span class="p">,</span> <span class="nx">free</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">free</span><span class="p">(</span><span class="nx">c</span> <span class="o">*</span><span class="nx">CFoo</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">C</span><span class="p">.</span><span class="nx">free</span><span class="p">(</span><span class="nx">unsafe</span><span class="p">.</span><span class="nx">Pointer</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">memory</span><span class="p">))</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">Lock</span><span class="p">()</span>
+</span><span class='line'>        <span class="k">defer</span> <span class="nx">c</span><span class="p">.</span><span class="nx">Unlock</span><span class="p">()</span>
+</span><span class='line'>        <span class="nx">c</span><span class="p">.</span><span class="nx">allocCnt</span><span class="o">--</span>
+</span><span class='line'>        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;free[%s]: count = %d\n&quot;</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">allocCnt</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">Bar</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">c1</span><span class="p">,</span> <span class="nx">c2</span> <span class="nx">CFoo</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">c1</span><span class="p">.</span><span class="nx">alloc</span><span class="p">(</span><span class="s">&quot;cfoo&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="nx">c2</span><span class="p">.</span><span class="nx">alloc</span><span class="p">(</span><span class="s">&quot;cbar&quot;</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">Bar</span><span class="p">()</span>
+</span><span class='line'>                <span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span><span class='line'>                <span class="c1">//runtime.GC()</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="nx">runtime</span><span class="p">.</span><span class="nx">GC</span><span class="p">()</span>
+</span><span class='line'>        <span class="nx">time</span><span class="p">.</span><span class="nx">Sleep</span><span class="p">(</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span>
+</span><span class='line'>        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;done.&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So what&rsquo;s going on here? First we create a struct that will contain our dynmaically allocated memory, <strong>CFoo</strong>. Inside of <strong>CFoo</strong> I threw in a Mutex, a <strong>name</strong>, a <strong>allocCnt</strong> to allow us to track the allocations and releases of the memory, and lastly <strong>memory</strong> of type <code>`unsafe.Pointer</code> that will point to our dnyamically allocated object.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Baruch</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2015-09-29T12:55:59-04:00'><span class='date'><span class='date-month'>Sep</span> <span class='date-day'>29</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>12:55 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/cgo/'>cgo,</a>, <a class='category' href='/blog/categories/destructors/'>destructors</a>, <a class='category' href='/blog/categories/golang/'>golang,</a>, <a class='category' href='/blog/categories/leaks/'>leaks,</a>, <a class='category' href='/blog/categories/memory/'>memory</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://rabarar.github.io/blog/2015/09/29/cgo-and-destructors-for-managing-allocated-memory-in-go/" data-via="" data-counturl="http://rabarar.github.io/blog/2015/09/29/cgo-and-destructors-for-managing-allocated-memory-in-go/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2015/09/22/jetson-tk-1-nvidia-l4t-linux-platform/" title="Previous Post: Jetson TK-1 nvidia L4T Linux Platform">&laquo; Jetson TK-1 nvidia L4T Linux Platform</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2015/09/29/cgo-and-destructors-for-managing-allocated-memory-in-go/">Cgo and Destructors for Managing Allocated Memory in Go</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/22/jetson-tk-1-nvidia-l4t-linux-platform/">Jetson TK-1 Nvidia L4T Linux Platform</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/17/golang-on-golang/">Golang on Golang</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/07/golang-scribbles/">Golang Scribbles</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/07/02/darkice-and-icecast/">DarkIce and IceCast</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Rob Baruch -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  <a href='http://www.facebook.com/robertbaruch' target='_blank'>
+	    <img src='/images/footer/facebook-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+    </a>
+
+      <a href='https://twitter.com/rabarar' target='_blank'>
+	        <img src='/images/footer/twitter-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+	</a>
+
+	<a href='https://github.com/rabarar' target='_blank'>
+		  <img src='/images/footer/github-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+	  </a>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rabarargithubio';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://rabarar.github.io/blog/2015/09/29/cgo-and-destructors-for-managing-allocated-memory-in-go/';
+        var disqus_url = 'http://rabarar.github.io/blog/2015/09/29/cgo-and-destructors-for-managing-allocated-memory-in-go/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
