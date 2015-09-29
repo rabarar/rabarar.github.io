@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Memory | Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/blog/categories/memory/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-09-29T13:28:52-04:00</updated>
+  <updated>2015-09-29T13:30:09-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -168,7 +168,7 @@
 
 <p>So what&rsquo;s going on here? First we create a struct that will contain our dynmaically allocated memory, <strong>CFoo</strong>. Inside of <strong>CFoo</strong> I threw in a Mutex, a <strong>name</strong>, a <strong>allocCnt</strong> to allow us to track the allocations and releases of the memory, and lastly <strong>memory</strong> of type <code>unsafe.Pointer</code> that will point to our dnyamically allocated object. The mutex and the count are soley illustrative and aren&rsquo;t likely needed in practice.</p>
 
-<p>Our <strong>CFoo</strong> struct contains a function <code>`alloc</code> that will do two important things:</p>
+<p>Our <strong>CFoo</strong> struct contains a function <code>alloc</code> that will do two important things:</p>
 
 <ul>
 <li>First it will allocated the memory via Cgo</li>
@@ -178,7 +178,7 @@
 
 <p>When we create the memory we assign it to our struct member. The object <strong>CFoo</strong> will exist until the context is no longer valid. And when it&rsquo;s invalid, the finalizer will be called <strong>when the garbage collector is invoked</strong>.</p>
 
-<p>the <code>free</code> function will take our <strong>CFoo</strong> and call the cgo <code>free()</code> to release the memory.</p>
+<p>the <code>`free</code> function will take our <strong>CFoo</strong> and call the cgo <code>free()</code> to release the memory.</p>
 
 <p>It&rsquo;s that simple!</p>
 ]]></content>
