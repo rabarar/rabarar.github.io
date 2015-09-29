@@ -247,7 +247,7 @@
 
 <p>When we create the memory we assign it to our struct member. The object <strong>CFoo</strong> will exist until the context is no longer valid. And when it&rsquo;s invalid, the finalizer will be called <strong>when the garbage collector is invoked</strong>.</p>
 
-<p>the <code>`free</code> function will take our <strong>CFoo</strong> and call the cgo <code>free()</code> to release the memory.</p>
+<p>the <code>`free(c *CFoo)</code> function will take our <strong>CFoo</strong> and call the cgo <code>free()</code> to release the memory.</p>
 
 <p>It&rsquo;s that simple!</p>
 </div>
