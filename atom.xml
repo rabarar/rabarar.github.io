@@ -4,7 +4,7 @@
   <title><![CDATA[Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2015-09-29T13:32:16-04:00</updated>
+  <updated>2016-02-05T12:53:32-05:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -12,6 +12,288 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Open Weather API and Golang]]></title>
+    <link href="http://rabarar.github.io/blog/2016/02/05/open-weather-api-and-golang/"/>
+    <updated>2016-02-05T12:40:06-05:00</updated>
+    <id>http://rabarar.github.io/blog/2016/02/05/open-weather-api-and-golang</id>
+    <content type="html"><![CDATA[<h2>Weather API</h2>
+
+<p>Today I tripped over the <a href="http://http://openweathermap.org">OpenWeatherMap</a> and created an account to see what type of weather information I can get from the <a href="http://openweathermap.org/api">published api</a>. Cool stuff.</p>
+
+<p>I thought I&rsquo;d write a quick little golang program to extract the json data and turn it into something that I could send to say(1), and then pump that through darkice(1) and icecast(1) on a raspberry pi! A talking weather station of sorts.</p>
+
+<p>Here&rsquo;s the code:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+<span class='line-number'>81</span>
+<span class='line-number'>82</span>
+<span class='line-number'>83</span>
+<span class='line-number'>84</span>
+<span class='line-number'>85</span>
+<span class='line-number'>86</span>
+<span class='line-number'>87</span>
+<span class='line-number'>88</span>
+<span class='line-number'>89</span>
+<span class='line-number'>90</span>
+<span class='line-number'>91</span>
+<span class='line-number'>92</span>
+<span class='line-number'>93</span>
+<span class='line-number'>94</span>
+<span class='line-number'>95</span>
+<span class='line-number'>96</span>
+<span class='line-number'>97</span>
+<span class='line-number'>98</span>
+<span class='line-number'>99</span>
+<span class='line-number'>100</span>
+<span class='line-number'>101</span>
+<span class='line-number'>102</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">main</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'>        <span class="s">&quot;encoding/json&quot;</span>
+</span><span class='line'>        <span class="s">&quot;fmt&quot;</span>
+</span><span class='line'>        <span class="s">&quot;io/ioutil&quot;</span>
+</span><span class='line'>        <span class="s">&quot;log&quot;</span>
+</span><span class='line'>        <span class="s">&quot;net/http&quot;</span>
+</span><span class='line'>        <span class="s">&quot;net/url&quot;</span>
+</span><span class='line'>        <span class="s">&quot;strings&quot;</span>
+</span><span class='line'>        <span class="s">&quot;time&quot;</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">const</span> <span class="p">(</span>
+</span><span class='line'>        <span class="nx">dumpRaw</span> <span class="p">=</span> <span class="kc">false</span>
+</span><span class='line'>        <span class="nx">zip</span>     <span class="p">=</span> <span class="s">&quot;21045,us&quot;</span>
+</span><span class='line'>        <span class="nx">api</span>     <span class="p">=</span> <span class="s">&quot;XXXXXXXXXXXXXXXXXXXXXXXXXX&quot;</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="p">(</span>
+</span><span class='line'>        <span class="nx">weatherKeys</span> <span class="p">=</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kt">bool</span><span class="p">{</span><span class="s">&quot;main&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="s">&quot;wind&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="s">&quot;coord&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="s">&quot;weather&quot;</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span> <span class="s">&quot;sys&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">,</span> <span class="s">&quot;clouds&quot;</span><span class="p">:</span> <span class="kc">false</span><span class="p">}</span>
+</span><span class='line'><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">urlString</span> <span class="o">:=</span> <span class="nx">fmt</span><span class="p">.</span><span class="nx">Sprintf</span><span class="p">(</span><span class="s">&quot;http://api.openweathermap.org/data/2.5/weather?zip=%s&amp;APPID=%s&quot;</span><span class="p">,</span> <span class="nx">zip</span><span class="p">,</span> <span class="nx">api</span><span class="p">)</span>
+</span><span class='line'>        <span class="nx">u</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">url</span><span class="p">.</span><span class="nx">Parse</span><span class="p">(</span><span class="nx">urlString</span><span class="p">)</span>
+</span><span class='line'>        <span class="nx">res</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">Get</span><span class="p">(</span><span class="nx">u</span><span class="p">.</span><span class="nx">String</span><span class="p">())</span>
+</span><span class='line'>        <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">jsonBlob</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">ioutil</span><span class="p">.</span><span class="nx">ReadAll</span><span class="p">(</span><span class="nx">res</span><span class="p">.</span><span class="nx">Body</span><span class="p">)</span>
+</span><span class='line'>        <span class="nx">res</span><span class="p">.</span><span class="nx">Body</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</span><span class='line'>        <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">data</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="nx">dumpRaw</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;blob = %s\n\n&quot;</span><span class="p">,</span> <span class="nx">jsonBlob</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="nx">err</span> <span class="p">=</span> <span class="nx">json</span><span class="p">.</span><span class="nx">Unmarshal</span><span class="p">(</span><span class="nx">jsonBlob</span><span class="p">,</span> <span class="o">&amp;</span><span class="nx">data</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;error:&quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="nx">dumpRaw</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;%+v&quot;</span><span class="p">,</span> <span class="nx">data</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">data</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">val</span><span class="p">,</span> <span class="nx">isAnArray</span> <span class="o">:=</span> <span class="nx">isKey</span><span class="p">(</span><span class="nx">k</span><span class="p">)</span>
+</span><span class='line'>                <span class="k">if</span> <span class="nx">val</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="nx">dumpMap</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">isAnArray</span><span class="p">)</span>
+</span><span class='line'>                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">dumpMap</span><span class="p">(</span><span class="nx">k</span> <span class="kt">string</span><span class="p">,</span> <span class="nx">v</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">isArray</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;%s:\n&quot;</span><span class="p">,</span> <span class="nx">k</span><span class="p">)</span>
+</span><span class='line'>        <span class="k">if</span> <span class="nx">isArray</span> <span class="p">{</span>
+</span><span class='line'>                <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="nx">v</span><span class="p">.([]</span><span class="kd">interface</span><span class="p">{}));</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="nx">nmap</span> <span class="o">:=</span> <span class="nx">v</span><span class="p">.([]</span><span class="kd">interface</span><span class="p">{})[</span><span class="nx">i</span><span class="p">].(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{})</span>
+</span><span class='line'>                        <span class="k">for</span> <span class="nx">kk</span><span class="p">,</span> <span class="nx">vv</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">nmap</span> <span class="p">{</span>
+</span><span class='line'>                                <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;\tthe %s is %v\n&quot;</span><span class="p">,</span> <span class="nx">kk</span><span class="p">,</span> <span class="nx">vv</span><span class="p">)</span>
+</span><span class='line'>                        <span class="p">}</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>                <span class="nx">nmap</span> <span class="o">:=</span> <span class="nx">v</span><span class="p">.(</span><span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{})</span>
+</span><span class='line'>                <span class="k">for</span> <span class="nx">kk</span><span class="p">,</span> <span class="nx">vv</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">nmap</span> <span class="p">{</span>
+</span><span class='line'>                        <span class="k">if</span> <span class="nx">isTempVal</span><span class="p">(</span><span class="nx">kk</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                                <span class="nx">farenTemp</span> <span class="o">:=</span> <span class="nx">faren</span><span class="p">(</span><span class="nx">vv</span><span class="p">.(</span><span class="kt">float64</span><span class="p">))</span>
+</span><span class='line'>                                <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;\tthe %s is %f\n&quot;</span><span class="p">,</span> <span class="nx">kk</span><span class="p">,</span> <span class="nx">farenTemp</span><span class="p">)</span>
+</span><span class='line'>                        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">isSunVal</span><span class="p">(</span><span class="nx">kk</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                                <span class="nx">sunTime</span> <span class="o">:=</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Unix</span><span class="p">((</span><span class="nb">int64</span><span class="p">(</span><span class="nx">vv</span><span class="p">.(</span><span class="kt">float64</span><span class="p">))),</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>                                <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;\tthe %s at %v\n&quot;</span><span class="p">,</span> <span class="nx">kk</span><span class="p">,</span> <span class="nx">sunTime</span><span class="p">)</span>
+</span><span class='line'>                        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span><span class='line'>                                <span class="nx">fmt</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;\tthe %s is %v\n&quot;</span><span class="p">,</span> <span class="nx">kk</span><span class="p">,</span> <span class="nx">vv</span><span class="p">)</span>
+</span><span class='line'>                        <span class="p">}</span>
+</span><span class='line'>                <span class="p">}</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">isKey</span><span class="p">(</span><span class="nx">k</span> <span class="kt">string</span><span class="p">)</span> <span class="p">(</span><span class="nx">ok</span> <span class="kt">bool</span><span class="p">,</span> <span class="nx">isArray</span> <span class="kt">bool</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">isArray</span><span class="p">,</span> <span class="nx">ok</span> <span class="p">=</span> <span class="nx">weatherKeys</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">ok</span><span class="p">,</span> <span class="nx">isArray</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">faren</span><span class="p">(</span><span class="nx">kelvin</span> <span class="kt">float64</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">(</span><span class="mf">9.0</span><span class="o">/</span><span class="mf">5.0</span><span class="o">*</span><span class="p">(</span><span class="nx">kelvin</span><span class="o">-</span><span class="mf">273.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">32.0</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">isTempVal</span><span class="p">(</span><span class="nx">k</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">Contains</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="s">&quot;temp&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">func</span> <span class="nx">isSunVal</span><span class="p">(</span><span class="nx">k</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">strings</span><span class="p">.</span><span class="nx">Contains</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="s">&quot;sun&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>So what&rsquo;s it do??</h2>
+
+<p>The given a zipcode, and an API Key, output generates something like this:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>main:
+</span><span class='line'>  the humidity is 83
+</span><span class='line'>  the temp_min is 38.962400
+</span><span class='line'>  the temp_max is 38.962400
+</span><span class='line'>  the sea_level is 1038.13
+</span><span class='line'>  the grnd_level is 1031.23
+</span><span class='line'>  the temp is 38.962400
+</span><span class='line'>  the pressure is 1031.23
+</span><span class='line'>wind:
+</span><span class='line'>  the speed is 6.26
+</span><span class='line'>  the deg is 319.504
+</span><span class='line'>clouds:
+</span><span class='line'>  the all is 32
+</span><span class='line'>sys:
+</span><span class='line'>  the message is 0.0066
+</span><span class='line'>  the country is US
+</span><span class='line'>  the sunrise at 2016-02-05 07:10:10 -0500 EST
+</span><span class='line'>  the sunset at 2016-02-05 17:33:06 -0500 EST
+</span><span class='line'>coord:
+</span><span class='line'>  the lon is -76.84
+</span><span class='line'>  the lat is 39.24
+</span><span class='line'>weather:
+</span><span class='line'>  the description is scattered clouds
+</span><span class='line'>  the icon is 03d
+</span><span class='line'>  the id is 802
+</span><span class='line'>  the main is Clouds</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Just a start&hellip; check out other API calls too&hellip;</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Cgo and Destructors for Managing Allocated Memory in Go]]></title>

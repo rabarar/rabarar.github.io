@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Baruch">
 
   
-  <meta name="description" content="Here&rsquo;s a fun little git I came across from Antoine Grondin. It&rsquo;s a cute little logfile color package to make your logfiles really pop! &hellip;">
+  <meta name="description" content="Sometimes you want to automate a workflow process by watching a filesystem directory and treating it like a work queue. As files arrive in the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,119 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/02/09/spying-on-files-with-fsnotify/">Spying on Files With Fsnotify</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2015-02-09T15:06:49-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>9</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:06 pm</span></time>
+        
+           | <a href="/blog/2015/02/09/spying-on-files-with-fsnotify/#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io/blog/2015/02/09/spying-on-files-with-fsnotify/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Sometimes you want to automate a workflow process by watching a filesystem directory and treating it like a work queue. As files arrive in the directory, a process watching the directory can be notified of new work items and kick off a process to perform the desired task.</p>
+
+<p>A golang package called <a href="http://godoc.org/gopkg.in/fsnotify.v1">fsnotify</a> does most of the nitty-gritty to make the details of implementing a queue manager somewhat trivial. Below is an example of how you would set up a queue to watch a directory using the package:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='go'><span class='line'>   <span class="kn">package</span> <span class="nx">main</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kn">import</span> <span class="p">(</span>
+</span><span class='line'>      <span class="s">&quot;log&quot;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="s">&quot;github.com/go-fsnotify/fsnotify&quot;</span>
+</span><span class='line'>  <span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">watcher</span><span class="p">,</span> <span class="nx">err</span> <span class="o">:=</span> <span class="nx">fsnotify</span><span class="p">.</span><span class="nx">NewWatcher</span><span class="p">()</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="k">defer</span> <span class="nx">watcher</span><span class="p">.</span><span class="nx">Close</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">done</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">go</span> <span class="kd">func</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>          <span class="k">for</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">select</span> <span class="p">{</span>
+</span><span class='line'>              <span class="k">case</span> <span class="nx">event</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">Events</span><span class="p">:</span>
+</span><span class='line'>                  <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;event:&quot;</span><span class="p">,</span> <span class="nx">event</span><span class="p">)</span>
+</span><span class='line'>                  <span class="k">if</span> <span class="nx">event</span><span class="p">.</span><span class="nx">Op</span><span class="o">&amp;</span><span class="nx">fsnotify</span><span class="p">.</span><span class="nx">Write</span> <span class="o">==</span> <span class="nx">fsnotify</span><span class="p">.</span><span class="nx">Write</span> <span class="p">{</span>
+</span><span class='line'>                      <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;modified file:&quot;</span><span class="p">,</span> <span class="nx">event</span><span class="p">.</span><span class="nx">Name</span><span class="p">)</span>
+</span><span class='line'>                  <span class="p">}</span>
+</span><span class='line'>              <span class="k">case</span> <span class="nx">err</span> <span class="o">:=</span> <span class="o">&lt;-</span><span class="nx">watcher</span><span class="p">.</span><span class="nx">Errors</span><span class="p">:</span>
+</span><span class='line'>                  <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;error:&quot;</span><span class="p">,</span> <span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>              <span class="p">}</span>
+</span><span class='line'>          <span class="p">}</span>
+</span><span class='line'>      <span class="p">}()</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nx">err</span> <span class="p">=</span> <span class="nx">watcher</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="s">&quot;/tmp/foo&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="k">if</span> <span class="nx">err</span> <span class="o">!=</span> <span class="kc">nil</span> <span class="p">{</span>
+</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Fatal</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="o">&lt;-</span><span class="nx">done</span>
+</span><span class='line'>  <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the main of the golang program, we create a new watcher and start a go-routine that selects events from the watcher Events channel. Each event is logged and then if an event of type &lsquo;fsnotiy.Write&rsquo; is received by the watcher, an additional log message is printed. Outside of the go-routine, we add the /tmp/foo directory to the watcher and wait on the done channel (which will block indefinitely).</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -614,6 +727,10 @@ Stay tuned for Golang Rants :)</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/02/05/open-weather-api-and-golang/">Open Weather API and Golang</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/09/29/cgo-and-destructors-for-managing-allocated-memory-in-go/">Cgo and Destructors for Managing Allocated Memory in Go</a>
       </li>
     
@@ -629,10 +746,6 @@ Stay tuned for Golang Rants :)</p>
         <a href="/blog/2015/07/07/golang-scribbles/">Golang Scribbles</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2015/07/02/darkice-and-icecast/">DarkIce and IceCast</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -646,7 +759,7 @@ Stay tuned for Golang Rants :)</p>
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2015 - Rob Baruch -
+  Copyright &copy; 2016 - Rob Baruch -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
   <a href='http://www.facebook.com/robertbaruch' target='_blank'>
 	    <img src='/images/footer/facebook-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
