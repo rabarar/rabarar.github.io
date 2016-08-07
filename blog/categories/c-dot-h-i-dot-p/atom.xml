@@ -4,7 +4,7 @@
   <title><![CDATA[Category: c.h.i.p. | Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/blog/categories/c-dot-h-i-dot-p/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2016-08-06T22:48:28-04:00</updated>
+  <updated>2016-08-06T22:49:36-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -106,7 +106,7 @@ make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- INSTALL_MOD_PATH=/tmp/
 git clone https://github.com/NextThingCo/RTL8723BS.git
 </code></pre>
 
-<p>And built it&hellip;</p>
+<p>And build it&hellip;</p>
 
 <pre><code>cd RTL8723BS
 

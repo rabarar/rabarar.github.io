@@ -4,7 +4,7 @@
   <title><![CDATA[Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2016-08-06T22:48:28-04:00</updated>
+  <updated>2016-08-06T22:49:36-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -122,7 +122,7 @@
 </span><span class='line'>git clone https://github.com/NextThingCo/RTL8723BS.git</span></code></pre></td></tr></table></div></figure>
 
 
-<p>And built it&hellip;</p>
+<p>And build it&hellip;</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
