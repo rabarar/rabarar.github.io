@@ -96,7 +96,7 @@
 
 <p>Turns out you can&rsquo;t use the <b>ppp</b/> out of the box on the CHIP as it&rsquo;s not part of the kernel. Depending on which flash you use, you might not even have USB-Serial support (via PL2303 or FTDI USB-to-Serial cables).</p>
 
-<p>So, roll up your sleeves and let&rsquo;s build us a new kernel! At first blush, this sounds far more daunting than it should. Having been a Unix kernel hacker for far too many years than I&rsquo;d care to admit, today&rsquo;s modern kernel build environment take a lot of the sting out of configuring and building your custom kernel.</p>
+<p>So, roll up your sleeves and let&rsquo;s build us a new kernel! At first blush, this sounds far more daunting than it should. Having been a Unix kernel hacker for far too many years than I&rsquo;d care to admit, today&rsquo;s modern kernel build environment takes a lot of the sting out of configuring and building your custom kernel.</p>
 
 <h2>Kernel hacking</h2>
 
@@ -160,11 +160,11 @@
 
 <p>This will bring up an easy to use menu-driven application that allows you to select or delete items that you wish to have in your kernel.</p>
 
-<p>Remember that config file that we copied over from the CHIP? Let&rsquo;s load that as are starting point.</p>
+<p>Remember that config file that we copied over from the CHIP? Let&rsquo;s load that as our starting point.</p>
 
-<p>Now make the modifications that you wish to your kernel. In this kernel, I want to add ppp support as well as ppp async-serial support. I select both of those, and then save my configuation file as <code>.config</code>.</p>
+<p>Now make the modifications that you wish to your kernel. In this kernel, I want to add ppp support as well as ppp async-serial support. I select both of those, and then save my configuration file as <code>.config</code>.</p>
 
-<p>Before we actually save the configuration, it&rsquo;s a good idea to mark your Kernel so you can actually verify you&rsquo;re running the kernel that you built. To do that we add a <code>Local Version</code> marking to the kernel release. Under the following Menu item:
+<p>Before we actually save the configuration, it&rsquo;s a good idea to mark your Kernel so you can easily verify you&rsquo;re running the kernel that you built. To do that we add a <code>Local Version</code> marking to the kernel release. Under the following Menu item:
 - General setup
 - ( ) Local version - append to kernel release</p>
 
@@ -192,6 +192,32 @@
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>cd /home/vagrant/CHIP-linux
 </span><span class='line'>git clone https://github.com/NextThingCo/RTL8723BS.git</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And built it&hellip;</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd RTL8723BS
+</span><span class='line'>
+</span><span class='line'>## Check out the Debian branch...
+</span><span class='line'>git checkout -b debian origin/debian
+</span><span class='line'>
+</span><span class='line'>## Patch it...
+</span><span class='line'>for i in debian/patches/0*; do  echo $i; patch -p 1 &lt;$i ; done
+</span><span class='line'>
+</span><span class='line'>## build it...
+</span><span class='line'>make -j 8 CONFIG_PLATFORM_ARM_SUNxI=y ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- -C /home/vagrant/CHIP-linux/ M=$PWD CONFIG_RTL8723BS=m  INSTALL_MOD_PATH=/tmp/lib
+</span><span class='line'>make -j 8 CONFIG_PLATFORM_ARM_SUNxI=y ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- -C /home/vagrant/CHIP-linux/ M=$PWD CONFIG_RTL8723BS=m  INSTALL_MOD_PATH=/tmp/lib modules_install</span></code></pre></td></tr></table></div></figure>
 
 
 <p>Now that everything is compiled and built, you&rsquo;re ready to copy it to your CHIP!</p>
