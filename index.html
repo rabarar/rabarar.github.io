@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Baruch">
 
   
-  <meta name="description" content="Weather API Today I tripped over the OpenWeatherMap and created an account to see what type of weather information I can get from the published api. &hellip;">
+  <meta name="description" content="Configuring C.H.I.P. to go Mobile! I recently received my $9 NTC CHIPs and decided a cool use of the tiny server would be to mate it up with the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,264 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/">CHIP GSM and GPS - a Cheap Linux Mobile Platform</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-08-06T17:40:17-04:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>5:40 pm</span></time>
+        
+           | <a href="/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>Configuring C.H.I.P. to go Mobile!</h2>
+
+<p>I recently received my $9 <a href="https://www.getchip.com">NTC CHIPs</a> and decided a cool use of the tiny server would be to mate it up with the <a href="https://www.adafruit.com/products/3147">Adafruit FONA  3G Cellular Breakout</a> and <a href="https://www.adafruit.com/products/2542">Adafruit FONA 2G Cellular and GPS Breakout</a> to test using both GPS and GSM GPRS via ppp on the CHIP.</p>
+
+<p>Turns out you can&rsquo;t use the <b>ppp</b/> out of the box on the CHIP as it&rsquo;s not part of the kernel. Depending on which flash you use, you might not even have USB-Serial support (via PL2303 or FTDI USB-to-Serial cables).</p>
+
+<p>So, roll up your sleeves and let&rsquo;s build us a new kernel! At first blush, this sounds far more daunting than it should. Having been a Unix kernel hacker for far too many years than I&rsquo;d care to admit, today&rsquo;s modern kernel build environment take a lot of the sting out of configuring and building your custom kernel.</p>
+
+<h2>Kernel hacking</h2>
+
+<p>We need to start by setting up an environment and pulling a code base to allow us to configure and build our kernel</p>
+
+<h2>- Build environment:</h2>
+
+<p>The build environment will consist of setting up a vagrant environment for the CHIP-SDK. There are great directions for doing so on the CHIP Documentation site. Take a <a href="http://docs.getchip.com/chip.html#installing-c-h-i-p-sdk">look</a> at these instructions on setting up the CHIP-SDK vagrant vm.</p>
+
+<p>Before you grab the source, you might need a few tools to make your vm ready to rock and roll. Specifically, add the following with your favorate package manager:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>apt-get install git build-essential \
+</span><span class='line'> fakeroot kernel-package zlib1g-dev \
+</span><span class='line'> libncurses5-dev lzop</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>apt-get install gcc-arm-linux-gnueabihf \
+</span><span class='line'>binutils-arm-linux-gnueabihf</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the vagrant machine is setup, clone the <a href="https://github.com/NextThingCo/CHIP-linux">CHIP-linux</a> source onto the machine into a working directory, say <code>CHIP-linux</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /home/vagrant
+</span><span class='line'>git clone https://github.com/NextThingCo/CHIP-linux.git</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next, check out the debian NTC release&hellip;</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd CHIP-linux
+</span><span class='line'>git checkout -b debian/4.3.0-ntc-4 origin/debian/4.3.0-ntc-4</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now you have the source, and the tools, and are ready to roll. But before you start the build process, we might want to start with our baseline config from our existing CHIP. This isn&rsquo;t a requirement, but it will allow you to either add to or subtract from a known kernel configuration.</p>
+
+<p>To grab your config file, simply:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>scp root@chip.local:/boot/config-4.3.0 .</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You might run into problem or two here depending on your CHIP Linux configuration. One, you may not have a root password! You might need to set that. Secondly, you might not have configured sshd to allow root login. Be sure you&rsquo;ve remedied both of these issues as we&rsquo;ll use root login throughout the kernel build process.</p>
+
+<h2>- Configuring the kernel</h2>
+
+<p>To configure our kernel, we simply invoke the makefile with the following:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- menuconfig</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will bring up an easy to use menu-driven application that allows you to select or delete items that you wish to have in your kernel.</p>
+
+<p>Remember that config file that we copied over from the CHIP? Let&rsquo;s load that as are starting point.</p>
+
+<p>Now make the modifications that you wish to your kernel. In this kernel, I want to add ppp support as well as ppp async-serial support. I select both of those, and then save my configuation file as <code>.config</code>.</p>
+
+<p>Before we actually save the configuration, it&rsquo;s a good idea to mark your Kernel so you can actually verify you&rsquo;re running the kernel that you built. To do that we add a <code>Local Version</code> marking to the kernel release. Under the following Menu item:
+- General setup
+- ( ) Local version - append to kernel release</p>
+
+<p>Add a tag that marks your kernel. I use <code>rb-2016-08-01.0</code> for example.</p>
+
+<p>Now I&rsquo;m ready to actually compile the kernel that represents the configuration that I just selected. To do so, simply run <code>make</code> as follows:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- -j n</span></code></pre></td></tr></table></div></figure>
+
+
+<p>where <code>n</code> is the number of cores that you have on your box.</p>
+
+<p>Once the compilation successfully completes, you&rsquo;ll next need to install the modules into a directory that we&rsquo;ll use later to place them onto the CHIP.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir /tmp/lib
+</span><span class='line'>make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- INSTALL_MOD_PATH=/tmp/lib modules_install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Add the <code>RTL8723BS</code>: This is not part of the CHIP-linux source tree.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /home/vagrant/CHIP-linux
+</span><span class='line'>git clone https://github.com/NextThingCo/RTL8723BS.git</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that everything is compiled and built, you&rsquo;re ready to copy it to your CHIP!</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>scp /home/vagrant/CHIP-linux/arch/arm/boot/zImage root@chip.local:/boot/vmlinuz-4.3.0rb-2016-08-01.1+
+</span><span class='line'>scp /home/vagrant/CHIP-linux/.config root@chip.local:/boot/config-4.3.0rb-2016-08-01.1+
+</span><span class='line'>scp /home/vagrant/CHIP-linux/System.map root@chip.local:/boot/System.map-4.3.0rb-2016-08-01.1+
+</span><span class='line'>cd /tmp/lib/lib/modules
+</span><span class='line'>tar cf - 4.3.0rb-2016-08-01.1+ | ssh root@chip.local 'cd /lib/modules; tar xf -'
+</span><span class='line'>cd ../firmware/
+</span><span class='line'>tar cf - . | ssh root@chip.local 'mkdir /lib/firmware/4.3.0rb-2016-08-01.1+; cd /lib/firmware/4.3.0rd235+; tar xf -'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now to boot your new kernel, there are two choices.</p>
+
+<h4>The Easy Choice:</h4>
+
+<p>Simply copy the existing kernel so you have a backup</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo cp /boot/zImage /boot/zImage.backup
+</span><span class='line'>sudo cp /boot/vmlinuz-4.3.0rb-2016-08-01.1 /boot/zImage</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Should something go wrong with the new kernel and you can&rsquo;t boot, you&rsquo;re hosed. There&rsquo;s another way.</p>
+
+<h4>The Complicated, But More Better for Ya Choice:</h4>
+
+<p>The more complicated, but far more flexible approach is to add a serial USB-to-Serial connector to the chip. You can use a PL2303 and connect it as follows:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>PL2303 TX (white wire)      -&gt; CHIP Pin 3
+</span><span class='line'>PL2303 RX (grey wire)       -&gt; CHIP Pin 5
+</span><span class='line'>PL2303 Gnd (black wire)     -&gt; CHIP Pin 1</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And on your computer use <code>screen</code> to access the serial port:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>screen /dev/ttyUSB0 115200</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Keep in mind that the actual device name may change depending on what OS you are using. I use the linux device name. Also, pay attention to the digit at the end, it might be some number other than zero.</p>
+
+<p>Before you connect the serial port, be sure to first copy the orgiginal kernel so you have a backup. And then shut down the CHIP before you connect the serial cable.</p>
+
+<p>Once all connected (both litreally with the USB connector as well as the screen command), type a key to stop the U-Boot booting process and fall into a u-boot shell.</p>
+
+<p>Now you can change the <code>bootcmd</code> and boot the kernel that you copied to the CHIP in the previous section. In this case, if there is a problem booting your new kernel, you can easily boot the backup kernel instead.</p>
+
+<p>Wah Lah! You have successfully booted your new kernel!</p>
+
+<p>If everything went as expected, you should be able to now connect your FONA 2g or 3g Cellular GSM breakout to a PL2303 and connect it to your CHIP. Be sure to use a lipo battery as well as a USB power source for your FONA. Turn it on, and verify that you can access the device.</p>
+
+<p>Here again, I use <code>screen /dev/ttyUSB0</code> to access the FONA. Verify that the PL2303 is accessable to the CHIP via <code>lsusb</code> and you should see the PL2303 signature. If you don&rsquo;t see it, you likely didn&rsquo;t configure your kernel properly to include the USB device.</p>
+
+<p>But if you did read the directions carefully, and have the device, and are able to <code>screen</code> to it, you should be able to communicate with the FONA by sending it <code>AT</code> commands, and receive back from the FONA a response, like <code>OK</code>.</p>
+
+<p>Make sure you&rsquo;ve added the <code>ppp</code> package.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get update
+</span><span class='line'>sudo apt-get install ppp</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If all&rsquo;s connected, and you&rsquo;ve successfully added the <code>ppp</code> package, you can now configure the ppp setup.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo -i
+</span><span class='line'>cd /etc/ppp/peers/
+</span><span class='line'>wget https://raw.githubusercontent.com/adafruit/FONA_PPP/master/fona</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now edit the file and change the <code>MUST CHANGE</code> items. There are essentialy two of them</p>
+
+<ul>
+<li><p>The first one is the APN. In my case I am using <a href="https://ting.com/?lpn=zs3fff5o1tf">Ting Wireless</a>. The APN is <code>wholesale</code></p></li>
+<li><p>The second item to change is the serial device. Make sure the device name that is connected to the FONA is specified in the file. For example, <code>/dev/ttyUSB0</code>.</p></li>
+</ul>
+
+
+<p>Save the file, and give it a go! To turn on and off ppp, use <code>pon`` and</code>poff&#8220;` respectivly.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo pon fona```</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can verify that it worked by looking for the interface. A successful ppp session will result in a device shown when you run <code>ifconfig</code>. If you run into problems, take a look at the log files for details on what went wrong. Common problems include forgetting to turn on the FONA device!</p>
+
+<p>take a look at the ppp chat script in the syslog file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cat /var/log/syslog | grep chat</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you successfully create your ppp connection and have verified it via <code>ifconfig</code>, try it out! simply ping a website of your choice.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ping yahoo.com</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To get a feel for the speed of the connection, grab some data too:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wget www.yahoo.com</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once you&rsquo;re done with your ppp connection, simply turn it off:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo poff fona</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1353,280 +1611,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/02/17/goroutines-channels/">GoRoutines, Channels, and Proper Exits</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-02-17T15:12:13-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>17</span><span class='date-suffix'>th</span>, <span class='date-year'>2015</span></span> <span class='time'>3:12 pm</span></time>
-        
-           | <a href="/blog/2015/02/17/goroutines-channels/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/02/17/goroutines-channels/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I read a great article summarizing the interrelationship between go routines, channel communications, unix signals and proper termination by <a href="http://adampresley.com/2015/02/16/waiting-for-goroutines-to-finish-running-before-exiting.html">Adam Presley</a>. In his article he describes how to coordinate starting a go routine, handling an interrupt, and then communicating through a channel to the go routine that the program wants to terminate.</p>
-
-<p>So what do you do if you have more than one go routine? You need to communicate to all and wait for all when you quit. Here&rsquo;s a contrived example that demonstrates one way to do it.</p>
-
-<p>One point to note. In this example we don&rsquo;t distinguish between which routines we wish to quit in any particular order. In fact, as implemented here, there is no deterministic way of knowing the order (How might you implement the code so that you would be able to deterministically know the order of go routine termination?)</p>
-
-<p>Here&rsquo;s an example that demonstrates how you might handle an arbitrary number of go routines:</p>
-
-<p>Let&rsquo;s say we start off with a constant number of routines we wish to create:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kd">const</span> <span class="p">(</span>
-</span><span class='line'>        <span class="nx">maxGoRoutines</span> <span class="p">=</span> <span class="mi">50</span>
-</span><span class='line'><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We will start a go routine  maxGoRoutines times and then we will ensure that we wait for the same number of routines to complete by using a waitGroup</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">waitGroup</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">{}</span>
-</span><span class='line'><span class="nx">waitGroup</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="nx">maxGoRoutines</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now let&rsquo;s define a simple go routine. We&rsquo;ll pass a channel to let us know when to quit, a waitGroup to indicate that we&rsquo;ve quit once we&rsquo;ve left the routine, and an identifier to distinguish between go routines to make our demo look cool!</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">shutdownChannel</span> <span class="kd">chan</span> <span class="kt">bool</span><span class="p">,</span> <span class="nx">waitGroup</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">,</span> <span class="nx">id</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Starting work goroutine...&quot;</span><span class="p">)</span>
-</span><span class='line'>  <span class="k">defer</span> <span class="nx">waitGroup</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">for</span> <span class="p">{</span>
-</span><span class='line'>      <span class="cm">/*</span>
-</span><span class='line'><span class="cm">      * Listen on channels for message.</span>
-</span><span class='line'><span class="cm">      */</span>
-</span><span class='line'>      <span class="k">select</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nx">_</span> <span class="p">=</span> <span class="o">&lt;-</span><span class="nx">shutdownChannel</span><span class="p">:</span>
-</span><span class='line'>          <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Received shutdown on goroutine %d\n&quot;</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>
-</span><span class='line'>          <span class="k">return</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">default</span><span class="p">:</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="c1">// Do some hard work here!</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}(</span><span class="nx">shutdownChannel</span><span class="p">,</span> <span class="nx">waitGroup</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Once we&rsquo;ve launed the routines, we&rsquo;ll wait for the program to terminate. We&rsquo;ve established a signal handler to let us know when SIGTERM or SIGQUIT by the following lines:</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="nx">quitChannel</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Signal</span><span class="p">)</span>
-</span><span class='line'><span class="nx">signal</span><span class="p">.</span><span class="nx">Notify</span><span class="p">(</span><span class="nx">quitChannel</span><span class="p">,</span> <span class="nx">syscall</span><span class="p">.</span><span class="nx">SIGINT</span><span class="p">,</span> <span class="nx">syscall</span><span class="p">.</span><span class="nx">SIGTERM</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Next, we&rsquo;ll wait to receive a signal that we&rsquo;ve quit by blocking on the quitChannel. Once we receive a message indicating that we&rsquo;ve quit, we&rsquo;ll send a boolean true to our go routine shutdownChannel.  Notice that we have to send as many messages to this channel as we have go routines. Otherwise, we&rsquo;ll leave go routines hanging around and that will block us from terminating.</p>
-
-<p>And finally, we wait for the waitGroup to complete. After each go routine calls its defered waitGroup.Done() function, we will unblock on the waitGroup.Wait() and can successfully exit!</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='go'><span class='line'>        <span class="nx">waitGroup</span><span class="p">.</span><span class="nx">Wait</span><span class="p">()</span>
-</span><span class='line'>        <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Done.&quot;</span><span class="p">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Here&rsquo;s the whole thing from soup to nuts!</p>
-
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-</pre></td><td class='code'><pre><code class='go'><span class='line'><span class="kn">package</span> <span class="nx">main</span>
-</span><span class='line'>
-</span><span class='line'><span class="kn">import</span> <span class="p">(</span>
-</span><span class='line'>        <span class="s">&quot;log&quot;</span>
-</span><span class='line'>        <span class="s">&quot;os&quot;</span>
-</span><span class='line'>        <span class="s">&quot;os/signal&quot;</span>
-</span><span class='line'>        <span class="s">&quot;runtime&quot;</span>
-</span><span class='line'>        <span class="s">&quot;sync&quot;</span>
-</span><span class='line'>        <span class="s">&quot;syscall&quot;</span>
-</span><span class='line'><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">const</span> <span class="p">(</span>
-</span><span class='line'>        <span class="nx">maxGoRoutines</span> <span class="p">=</span> <span class="mi">50</span>
-</span><span class='line'><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nx">runtime</span><span class="p">.</span><span class="nx">GOMAXPROCS</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">float64</span><span class="p">(</span><span class="nx">runtime</span><span class="p">.</span><span class="nx">NumCPU</span><span class="p">())</span> <span class="o">*</span> <span class="mf">1.25</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Starting application...&quot;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="cm">/*</span>
-</span><span class='line'><span class="cm">         * When SIGINT or SIGTERM is caught write to the quitChannel</span>
-</span><span class='line'><span class="cm">         */</span>
-</span><span class='line'>        <span class="nx">quitChannel</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Signal</span><span class="p">)</span>
-</span><span class='line'>        <span class="nx">signal</span><span class="p">.</span><span class="nx">Notify</span><span class="p">(</span><span class="nx">quitChannel</span><span class="p">,</span> <span class="nx">syscall</span><span class="p">.</span><span class="nx">SIGINT</span><span class="p">,</span> <span class="nx">syscall</span><span class="p">.</span><span class="nx">SIGTERM</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nx">shutdownChannel</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">(</span><span class="kd">chan</span> <span class="kt">bool</span><span class="p">)</span>
-</span><span class='line'>        <span class="nx">waitGroup</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">{}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nx">waitGroup</span><span class="p">.</span><span class="nx">Add</span><span class="p">(</span><span class="nx">maxGoRoutines</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="cm">/*</span>
-</span><span class='line'><span class="cm">         * Create a goroutine that does imaginary work</span>
-</span><span class='line'><span class="cm">         */</span>
-</span><span class='line'>        <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">maxGoRoutines</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-</span><span class='line'>                <span class="k">go</span> <span class="kd">func</span><span class="p">(</span><span class="nx">shutdownChannel</span> <span class="kd">chan</span> <span class="kt">bool</span><span class="p">,</span> <span class="nx">waitGroup</span> <span class="o">*</span><span class="nx">sync</span><span class="p">.</span><span class="nx">WaitGroup</span><span class="p">,</span> <span class="nx">id</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>                        <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Starting work goroutine...&quot;</span><span class="p">)</span>
-</span><span class='line'>                        <span class="k">defer</span> <span class="nx">waitGroup</span><span class="p">.</span><span class="nx">Done</span><span class="p">()</span>
-</span><span class='line'>
-</span><span class='line'>                        <span class="k">for</span> <span class="p">{</span>
-</span><span class='line'>                                <span class="cm">/*</span>
-</span><span class='line'><span class="cm">                                 * Listen on channels for message.</span>
-</span><span class='line'><span class="cm">                                 */</span>
-</span><span class='line'>                                <span class="k">select</span> <span class="p">{</span>
-</span><span class='line'>                                <span class="k">case</span> <span class="nx">_</span> <span class="p">=</span> <span class="o">&lt;-</span><span class="nx">shutdownChannel</span><span class="p">:</span>
-</span><span class='line'>                                        <span class="nx">log</span><span class="p">.</span><span class="nx">Printf</span><span class="p">(</span><span class="s">&quot;Received shutdown on goroutine %d\n&quot;</span><span class="p">,</span> <span class="nx">id</span><span class="p">)</span>
-</span><span class='line'>                                        <span class="k">return</span>
-</span><span class='line'>
-</span><span class='line'>                                <span class="k">default</span><span class="p">:</span>
-</span><span class='line'>                                <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>                                <span class="c1">// Do some hard work here!</span>
-</span><span class='line'>                        <span class="p">}</span>
-</span><span class='line'>                <span class="p">}(</span><span class="nx">shutdownChannel</span><span class="p">,</span> <span class="nx">waitGroup</span><span class="p">,</span> <span class="nx">i</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="cm">/*</span>
-</span><span class='line'><span class="cm">         * Wait until we get the quit message</span>
-</span><span class='line'><span class="cm">         */</span>
-</span><span class='line'>        <span class="o">&lt;-</span><span class="nx">quitChannel</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Received quit. Sending shutdown and waiting on goroutines...&quot;</span><span class="p">)</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">maxGoRoutines</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
-</span><span class='line'>                <span class="nx">shutdownChannel</span> <span class="o">&lt;-</span> <span class="kc">true</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="cm">/*</span>
-</span><span class='line'><span class="cm">         * Block until wait group counter gets to zero</span>
-</span><span class='line'><span class="cm">         */</span>
-</span><span class='line'>        <span class="nx">waitGroup</span><span class="p">.</span><span class="nx">Wait</span><span class="p">()</span>
-</span><span class='line'>        <span class="nx">log</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="s">&quot;Done.&quot;</span><span class="p">)</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -1642,6 +1626,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/">CHIP GSM and GPS - a Cheap Linux Mobile Platform</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2016/02/05/open-weather-api-and-golang/">Open Weather API and Golang</a>
       </li>
     
@@ -1655,10 +1643,6 @@
     
       <li class="post">
         <a href="/blog/2015/08/17/golang-on-golang/">Golang on Golang</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2015/07/07/golang-scribbles/">Golang Scribbles</a>
       </li>
     
   </ul>

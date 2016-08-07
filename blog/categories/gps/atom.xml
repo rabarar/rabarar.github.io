@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Gps | Rabarar\'s Blog]]></title>
+  <link href="http://rabarar.github.io/blog/categories/gps/atom.xml" rel="self"/>
+  <link href="http://rabarar.github.io/"/>
+  <updated>2016-08-06T21:58:12-04:00</updated>
+  <id>http://rabarar.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Baruch]]></name>
+    <email><![CDATA[rabarar@yahoo.com]]></email>
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[CHIP GSM and GPS - a Cheap Linux Mobile Platform]]></title>
+    <link href="http://rabarar.github.io/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/"/>
+    <updated>2016-08-06T17:40:17-04:00</updated>
+    <id>http://rabarar.github.io/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform</id>
+    <content type="html"><![CDATA[<h2>Configuring C.H.I.P. to go Mobile!</h2>
+
+<p>I recently received my $9 <a href="https://www.getchip.com">NTC CHIPs</a> and decided a cool use of the tiny server would be to mate it up with the <a href="https://www.adafruit.com/products/3147">Adafruit FONA  3G Cellular Breakout</a> and <a href="https://www.adafruit.com/products/2542">Adafruit FONA 2G Cellular and GPS Breakout</a> to test using both GPS and GSM GPRS via ppp on the CHIP.</p>
+
+<p>Turns out you can&rsquo;t use the <b>ppp</b/> out of the box on the CHIP as it&rsquo;s not part of the kernel. Depending on which flash you use, you might not even have USB-Serial support (via PL2303 or FTDI USB-to-Serial cables).</p>
+
+<p>So, roll up your sleeves and let&rsquo;s build us a new kernel! At first blush, this sounds far more daunting than it should. Having been a Unix kernel hacker for far too many years than I&rsquo;d care to admit, today&rsquo;s modern kernel build environment take a lot of the sting out of configuring and building your custom kernel.</p>
+
+<h2>Kernel hacking</h2>
+
+<p>We need to start by setting up an environment and pulling a code base to allow us to configure and build our kernel</p>
+
+<h2>- Build environment:</h2>
+
+<p>The build environment will consist of setting up a vagrant environment for the CHIP-SDK. There are great directions for doing so on the CHIP Documentation site. Take a <a href="http://docs.getchip.com/chip.html#installing-c-h-i-p-sdk">look</a> at these instructions on setting up the CHIP-SDK vagrant vm.</p>
+
+<p>Before you grab the source, you might need a few tools to make your vm ready to rock and roll. Specifically, add the following with your favorate package manager:</p>
+
+<pre><code>apt-get install git build-essential \
+ fakeroot kernel-package zlib1g-dev \
+ libncurses5-dev lzop
+</code></pre>
+
+<p>and</p>
+
+<pre><code>apt-get install gcc-arm-linux-gnueabihf \
+binutils-arm-linux-gnueabihf
+</code></pre>
+
+<p>Once the vagrant machine is setup, clone the <a href="https://github.com/NextThingCo/CHIP-linux">CHIP-linux</a> source onto the machine into a working directory, say <code>CHIP-linux</code></p>
+
+<pre><code>cd /home/vagrant
+git clone https://github.com/NextThingCo/CHIP-linux.git
+</code></pre>
+
+<p>Next, check out the debian NTC release&hellip;</p>
+
+<pre><code>cd CHIP-linux
+git checkout -b debian/4.3.0-ntc-4 origin/debian/4.3.0-ntc-4
+</code></pre>
+
+<p>Now you have the source, and the tools, and are ready to roll. But before you start the build process, we might want to start with our baseline config from our existing CHIP. This isn&rsquo;t a requirement, but it will allow you to either add to or subtract from a known kernel configuration.</p>
+
+<p>To grab your config file, simply:</p>
+
+<pre><code>scp root@chip.local:/boot/config-4.3.0 .
+</code></pre>
+
+<p>You might run into problem or two here depending on your CHIP Linux configuration. One, you may not have a root password! You might need to set that. Secondly, you might not have configured sshd to allow root login. Be sure you&rsquo;ve remedied both of these issues as we&rsquo;ll use root login throughout the kernel build process.</p>
+
+<h2>- Configuring the kernel</h2>
+
+<p>To configure our kernel, we simply invoke the makefile with the following:</p>
+
+<pre><code>make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- menuconfig
+</code></pre>
+
+<p>This will bring up an easy to use menu-driven application that allows you to select or delete items that you wish to have in your kernel.</p>
+
+<p>Remember that config file that we copied over from the CHIP? Let&rsquo;s load that as are starting point.</p>
+
+<p>Now make the modifications that you wish to your kernel. In this kernel, I want to add ppp support as well as ppp async-serial support. I select both of those, and then save my configuation file as <code>.config</code>.</p>
+
+<p>Before we actually save the configuration, it&rsquo;s a good idea to mark your Kernel so you can actually verify you&rsquo;re running the kernel that you built. To do that we add a <code>Local Version</code> marking to the kernel release. Under the following Menu item:
+- General setup
+- ( ) Local version - append to kernel release</p>
+
+<p>Add a tag that marks your kernel. I use <code>rb-2016-08-01.0</code> for example.</p>
+
+<p>Now I&rsquo;m ready to actually compile the kernel that represents the configuration that I just selected. To do so, simply run <code>make</code> as follows:</p>
+
+<pre><code>make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- -j n
+</code></pre>
+
+<p>where <code>n</code> is the number of cores that you have on your box.</p>
+
+<p>Once the compilation successfully completes, you&rsquo;ll next need to install the modules into a directory that we&rsquo;ll use later to place them onto the CHIP.</p>
+
+<pre><code>mkdir /tmp/lib
+make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- INSTALL_MOD_PATH=/tmp/lib modules_install
+</code></pre>
+
+<p>Add the <code>RTL8723BS</code>: This is not part of the CHIP-linux source tree.</p>
+
+<pre><code>cd /home/vagrant/CHIP-linux
+git clone https://github.com/NextThingCo/RTL8723BS.git
+</code></pre>
+
+<p>Now that everything is compiled and built, you&rsquo;re ready to copy it to your CHIP!</p>
+
+<pre><code>scp /home/vagrant/CHIP-linux/arch/arm/boot/zImage root@chip.local:/boot/vmlinuz-4.3.0rb-2016-08-01.1+
+scp /home/vagrant/CHIP-linux/.config root@chip.local:/boot/config-4.3.0rb-2016-08-01.1+
+scp /home/vagrant/CHIP-linux/System.map root@chip.local:/boot/System.map-4.3.0rb-2016-08-01.1+
+cd /tmp/lib/lib/modules
+tar cf - 4.3.0rb-2016-08-01.1+ | ssh root@chip.local 'cd /lib/modules; tar xf -'
+cd ../firmware/
+tar cf - . | ssh root@chip.local 'mkdir /lib/firmware/4.3.0rb-2016-08-01.1+; cd /lib/firmware/4.3.0rd235+; tar xf -'
+</code></pre>
+
+<p>Now to boot your new kernel, there are two choices.</p>
+
+<h4>The Easy Choice:</h4>
+
+<p>Simply copy the existing kernel so you have a backup</p>
+
+<pre><code>sudo cp /boot/zImage /boot/zImage.backup
+sudo cp /boot/vmlinuz-4.3.0rb-2016-08-01.1 /boot/zImage
+</code></pre>
+
+<p>Should something go wrong with the new kernel and you can&rsquo;t boot, you&rsquo;re hosed. There&rsquo;s another way.</p>
+
+<h4>The Complicated, But More Better for Ya Choice:</h4>
+
+<p>The more complicated, but far more flexible approach is to add a serial USB-to-Serial connector to the chip. You can use a PL2303 and connect it as follows:</p>
+
+<pre><code>PL2303 TX (white wire)      -&gt; CHIP Pin 3
+PL2303 RX (grey wire)       -&gt; CHIP Pin 5
+PL2303 Gnd (black wire)     -&gt; CHIP Pin 1
+</code></pre>
+
+<p>And on your computer use <code>screen</code> to access the serial port:</p>
+
+<pre><code>screen /dev/ttyUSB0 115200
+</code></pre>
+
+<p>Keep in mind that the actual device name may change depending on what OS you are using. I use the linux device name. Also, pay attention to the digit at the end, it might be some number other than zero.</p>
+
+<p>Before you connect the serial port, be sure to first copy the orgiginal kernel so you have a backup. And then shut down the CHIP before you connect the serial cable.</p>
+
+<p>Once all connected (both litreally with the USB connector as well as the screen command), type a key to stop the U-Boot booting process and fall into a u-boot shell.</p>
+
+<p>Now you can change the <code>bootcmd</code> and boot the kernel that you copied to the CHIP in the previous section. In this case, if there is a problem booting your new kernel, you can easily boot the backup kernel instead.</p>
+
+<p>Wah Lah! You have successfully booted your new kernel!</p>
+
+<p>If everything went as expected, you should be able to now connect your FONA 2g or 3g Cellular GSM breakout to a PL2303 and connect it to your CHIP. Be sure to use a lipo battery as well as a USB power source for your FONA. Turn it on, and verify that you can access the device.</p>
+
+<p>Here again, I use <code>screen /dev/ttyUSB0</code> to access the FONA. Verify that the PL2303 is accessable to the CHIP via <code>lsusb</code> and you should see the PL2303 signature. If you don&rsquo;t see it, you likely didn&rsquo;t configure your kernel properly to include the USB device.</p>
+
+<p>But if you did read the directions carefully, and have the device, and are able to <code>screen</code> to it, you should be able to communicate with the FONA by sending it <code>AT</code> commands, and receive back from the FONA a response, like <code>OK</code>.</p>
+
+<p>Make sure you&rsquo;ve added the <code>ppp</code> package.</p>
+
+<pre><code>sudo apt-get update
+sudo apt-get install ppp
+</code></pre>
+
+<p>If all&rsquo;s connected, and you&rsquo;ve successfully added the <code>ppp</code> package, you can now configure the ppp setup.</p>
+
+<pre><code>sudo -i
+cd /etc/ppp/peers/
+wget https://raw.githubusercontent.com/adafruit/FONA_PPP/master/fona
+</code></pre>
+
+<p>Now edit the file and change the <code>MUST CHANGE</code> items. There are essentialy two of them</p>
+
+<ul>
+<li><p>The first one is the APN. In my case I am using <a href="https://ting.com/?lpn=zs3fff5o1tf">Ting Wireless</a>. The APN is <code>wholesale</code></p></li>
+<li><p>The second item to change is the serial device. Make sure the device name that is connected to the FONA is specified in the file. For example, <code>/dev/ttyUSB0</code>.</p></li>
+</ul>
+
+
+<p>Save the file, and give it a go! To turn on and off ppp, use <code>pon`` and</code>poff&#8220;` respectivly.</p>
+
+<pre><code>sudo pon fona```
+</code></pre>
+
+<p>You can verify that it worked by looking for the interface. A successful ppp session will result in a device shown when you run <code>ifconfig</code>. If you run into problems, take a look at the log files for details on what went wrong. Common problems include forgetting to turn on the FONA device!</p>
+
+<p>take a look at the ppp chat script in the syslog file:</p>
+
+<pre><code>cat /var/log/syslog | grep chat
+</code></pre>
+
+<p>If you successfully create your ppp connection and have verified it via <code>ifconfig</code>, try it out! simply ping a website of your choice.</p>
+
+<pre><code>ping yahoo.com
+</code></pre>
+
+<p>To get a feel for the speed of the connection, grab some data too:</p>
+
+<pre><code>wget www.yahoo.com
+</code></pre>
+
+<p>Once you&rsquo;re done with your ppp connection, simply turn it off:</p>
+
+<pre><code>sudo poff fona
+</code></pre>
+]]></content>
+  </entry>
+  
+</feed>

@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>CHIP GSM and GPS - a Cheap Linux Mobile Platform - Rabarar&#39;s Blog</title>
+  <meta name="author" content="Rob Baruch">
+
+  
+  <meta name="description" content="Configuring C.H.I.P. to go Mobile! I recently received my $9 NTC CHIPs and decided a cool use of the tiny server would be to mate it up with the &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://rabarar.github.io/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Rabarar\'s Blog" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="//fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Rabarar&#39;s Blog</a></h1>
+  
+    <h2>A blogging framework for mild hackers.</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rabarar.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">CHIP GSM and GPS - a Cheap Linux Mobile Platform</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2016-08-06T17:40:17-04:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>5:40 pm</span></time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Configuring C.H.I.P. to go Mobile!</h2>
+
+<p>I recently received my $9 <a href="https://www.getchip.com">NTC CHIPs</a> and decided a cool use of the tiny server would be to mate it up with the <a href="https://www.adafruit.com/products/3147">Adafruit FONA  3G Cellular Breakout</a> and <a href="https://www.adafruit.com/products/2542">Adafruit FONA 2G Cellular and GPS Breakout</a> to test using both GPS and GSM GPRS via ppp on the CHIP.</p>
+
+<p>Turns out you can&rsquo;t use the <b>ppp</b/> out of the box on the CHIP as it&rsquo;s not part of the kernel. Depending on which flash you use, you might not even have USB-Serial support (via PL2303 or FTDI USB-to-Serial cables).</p>
+
+<p>So, roll up your sleeves and let&rsquo;s build us a new kernel! At first blush, this sounds far more daunting than it should. Having been a Unix kernel hacker for far too many years than I&rsquo;d care to admit, today&rsquo;s modern kernel build environment take a lot of the sting out of configuring and building your custom kernel.</p>
+
+<h2>Kernel hacking</h2>
+
+<p>We need to start by setting up an environment and pulling a code base to allow us to configure and build our kernel</p>
+
+<h2>- Build environment:</h2>
+
+<p>The build environment will consist of setting up a vagrant environment for the CHIP-SDK. There are great directions for doing so on the CHIP Documentation site. Take a <a href="http://docs.getchip.com/chip.html#installing-c-h-i-p-sdk">look</a> at these instructions on setting up the CHIP-SDK vagrant vm.</p>
+
+<p>Before you grab the source, you might need a few tools to make your vm ready to rock and roll. Specifically, add the following with your favorate package manager:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>apt-get install git build-essential \
+</span><span class='line'> fakeroot kernel-package zlib1g-dev \
+</span><span class='line'> libncurses5-dev lzop</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>apt-get install gcc-arm-linux-gnueabihf \
+</span><span class='line'>binutils-arm-linux-gnueabihf</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once the vagrant machine is setup, clone the <a href="https://github.com/NextThingCo/CHIP-linux">CHIP-linux</a> source onto the machine into a working directory, say <code>CHIP-linux</code></p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /home/vagrant
+</span><span class='line'>git clone https://github.com/NextThingCo/CHIP-linux.git</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next, check out the debian NTC release&hellip;</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd CHIP-linux
+</span><span class='line'>git checkout -b debian/4.3.0-ntc-4 origin/debian/4.3.0-ntc-4</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now you have the source, and the tools, and are ready to roll. But before you start the build process, we might want to start with our baseline config from our existing CHIP. This isn&rsquo;t a requirement, but it will allow you to either add to or subtract from a known kernel configuration.</p>
+
+<p>To grab your config file, simply:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>scp root@chip.local:/boot/config-4.3.0 .</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You might run into problem or two here depending on your CHIP Linux configuration. One, you may not have a root password! You might need to set that. Secondly, you might not have configured sshd to allow root login. Be sure you&rsquo;ve remedied both of these issues as we&rsquo;ll use root login throughout the kernel build process.</p>
+
+<h2>- Configuring the kernel</h2>
+
+<p>To configure our kernel, we simply invoke the makefile with the following:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- menuconfig</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will bring up an easy to use menu-driven application that allows you to select or delete items that you wish to have in your kernel.</p>
+
+<p>Remember that config file that we copied over from the CHIP? Let&rsquo;s load that as are starting point.</p>
+
+<p>Now make the modifications that you wish to your kernel. In this kernel, I want to add ppp support as well as ppp async-serial support. I select both of those, and then save my configuation file as <code>.config</code>.</p>
+
+<p>Before we actually save the configuration, it&rsquo;s a good idea to mark your Kernel so you can actually verify you&rsquo;re running the kernel that you built. To do that we add a <code>Local Version</code> marking to the kernel release. Under the following Menu item:
+- General setup
+- ( ) Local version - append to kernel release</p>
+
+<p>Add a tag that marks your kernel. I use <code>rb-2016-08-01.0</code> for example.</p>
+
+<p>Now I&rsquo;m ready to actually compile the kernel that represents the configuration that I just selected. To do so, simply run <code>make</code> as follows:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- -j n</span></code></pre></td></tr></table></div></figure>
+
+
+<p>where <code>n</code> is the number of cores that you have on your box.</p>
+
+<p>Once the compilation successfully completes, you&rsquo;ll next need to install the modules into a directory that we&rsquo;ll use later to place them onto the CHIP.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>mkdir /tmp/lib
+</span><span class='line'>make ARCH=arm CROSS_COMPILE=/usr/bin/arm-linux-gnueabihf- INSTALL_MOD_PATH=/tmp/lib modules_install</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Add the <code>RTL8723BS</code>: This is not part of the CHIP-linux source tree.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cd /home/vagrant/CHIP-linux
+</span><span class='line'>git clone https://github.com/NextThingCo/RTL8723BS.git</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that everything is compiled and built, you&rsquo;re ready to copy it to your CHIP!</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>scp /home/vagrant/CHIP-linux/arch/arm/boot/zImage root@chip.local:/boot/vmlinuz-4.3.0rb-2016-08-01.1+
+</span><span class='line'>scp /home/vagrant/CHIP-linux/.config root@chip.local:/boot/config-4.3.0rb-2016-08-01.1+
+</span><span class='line'>scp /home/vagrant/CHIP-linux/System.map root@chip.local:/boot/System.map-4.3.0rb-2016-08-01.1+
+</span><span class='line'>cd /tmp/lib/lib/modules
+</span><span class='line'>tar cf - 4.3.0rb-2016-08-01.1+ | ssh root@chip.local 'cd /lib/modules; tar xf -'
+</span><span class='line'>cd ../firmware/
+</span><span class='line'>tar cf - . | ssh root@chip.local 'mkdir /lib/firmware/4.3.0rb-2016-08-01.1+; cd /lib/firmware/4.3.0rd235+; tar xf -'</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now to boot your new kernel, there are two choices.</p>
+
+<h4>The Easy Choice:</h4>
+
+<p>Simply copy the existing kernel so you have a backup</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo cp /boot/zImage /boot/zImage.backup
+</span><span class='line'>sudo cp /boot/vmlinuz-4.3.0rb-2016-08-01.1 /boot/zImage</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Should something go wrong with the new kernel and you can&rsquo;t boot, you&rsquo;re hosed. There&rsquo;s another way.</p>
+
+<h4>The Complicated, But More Better for Ya Choice:</h4>
+
+<p>The more complicated, but far more flexible approach is to add a serial USB-to-Serial connector to the chip. You can use a PL2303 and connect it as follows:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>PL2303 TX (white wire)      -&gt; CHIP Pin 3
+</span><span class='line'>PL2303 RX (grey wire)       -&gt; CHIP Pin 5
+</span><span class='line'>PL2303 Gnd (black wire)     -&gt; CHIP Pin 1</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And on your computer use <code>screen</code> to access the serial port:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>screen /dev/ttyUSB0 115200</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Keep in mind that the actual device name may change depending on what OS you are using. I use the linux device name. Also, pay attention to the digit at the end, it might be some number other than zero.</p>
+
+<p>Before you connect the serial port, be sure to first copy the orgiginal kernel so you have a backup. And then shut down the CHIP before you connect the serial cable.</p>
+
+<p>Once all connected (both litreally with the USB connector as well as the screen command), type a key to stop the U-Boot booting process and fall into a u-boot shell.</p>
+
+<p>Now you can change the <code>bootcmd</code> and boot the kernel that you copied to the CHIP in the previous section. In this case, if there is a problem booting your new kernel, you can easily boot the backup kernel instead.</p>
+
+<p>Wah Lah! You have successfully booted your new kernel!</p>
+
+<p>If everything went as expected, you should be able to now connect your FONA 2g or 3g Cellular GSM breakout to a PL2303 and connect it to your CHIP. Be sure to use a lipo battery as well as a USB power source for your FONA. Turn it on, and verify that you can access the device.</p>
+
+<p>Here again, I use <code>screen /dev/ttyUSB0</code> to access the FONA. Verify that the PL2303 is accessable to the CHIP via <code>lsusb</code> and you should see the PL2303 signature. If you don&rsquo;t see it, you likely didn&rsquo;t configure your kernel properly to include the USB device.</p>
+
+<p>But if you did read the directions carefully, and have the device, and are able to <code>screen</code> to it, you should be able to communicate with the FONA by sending it <code>AT</code> commands, and receive back from the FONA a response, like <code>OK</code>.</p>
+
+<p>Make sure you&rsquo;ve added the <code>ppp</code> package.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt-get update
+</span><span class='line'>sudo apt-get install ppp</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If all&rsquo;s connected, and you&rsquo;ve successfully added the <code>ppp</code> package, you can now configure the ppp setup.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo -i
+</span><span class='line'>cd /etc/ppp/peers/
+</span><span class='line'>wget https://raw.githubusercontent.com/adafruit/FONA_PPP/master/fona</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now edit the file and change the <code>MUST CHANGE</code> items. There are essentialy two of them</p>
+
+<ul>
+<li><p>The first one is the APN. In my case I am using <a href="https://ting.com/?lpn=zs3fff5o1tf">Ting Wireless</a>. The APN is <code>wholesale</code></p></li>
+<li><p>The second item to change is the serial device. Make sure the device name that is connected to the FONA is specified in the file. For example, <code>/dev/ttyUSB0</code>.</p></li>
+</ul>
+
+
+<p>Save the file, and give it a go! To turn on and off ppp, use <code>pon`` and</code>poff&#8220;` respectivly.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo pon fona```</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can verify that it worked by looking for the interface. A successful ppp session will result in a device shown when you run <code>ifconfig</code>. If you run into problems, take a look at the log files for details on what went wrong. Common problems include forgetting to turn on the FONA device!</p>
+
+<p>take a look at the ppp chat script in the syslog file:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>cat /var/log/syslog | grep chat</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you successfully create your ppp connection and have verified it via <code>ifconfig</code>, try it out! simply ping a website of your choice.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>ping yahoo.com</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To get a feel for the speed of the connection, grab some data too:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>wget www.yahoo.com</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once you&rsquo;re done with your ppp connection, simply turn it off:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo poff fona</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Baruch</span></span>
+
+      
+
+
+
+
+<time class='entry-date' datetime='2016-08-06T17:40:17-04:00'><span class='date'><span class='date-month'>Aug</span> <span class='date-day'>6</span><span class='date-suffix'>th</span>, <span class='date-year'>2016</span></span> <span class='time'>5:40 pm</span></time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/c-dot-h-i-dot-p/'>c.h.i.p.</a>, <a class='category' href='/blog/categories/gps/'>gps</a>, <a class='category' href='/blog/categories/gsm/'>gsm</a>, <a class='category' href='/blog/categories/linux/'>linux</a>, <a class='category' href='/blog/categories/ntc/'>ntc</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://rabarar.github.io/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/" data-via="" data-counturl="http://rabarar.github.io/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2016/02/05/open-weather-api-and-golang/" title="Previous Post: Open Weather API and Golang">&laquo; Open Weather API and Golang</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/">CHIP GSM and GPS - a Cheap Linux Mobile Platform</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2016/02/05/open-weather-api-and-golang/">Open Weather API and Golang</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/29/cgo-and-destructors-for-managing-allocated-memory-in-go/">Cgo and Destructors for Managing Allocated Memory in Go</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/09/22/jetson-tk-1-nvidia-l4t-linux-platform/">Jetson TK-1 Nvidia L4T Linux Platform</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2015/08/17/golang-on-golang/">Golang on Golang</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2016 - Rob Baruch -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+  <a href='http://www.facebook.com/robertbaruch' target='_blank'>
+	    <img src='/images/footer/facebook-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+    </a>
+
+      <a href='https://twitter.com/rabarar' target='_blank'>
+	        <img src='/images/footer/twitter-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+	</a>
+
+	<a href='https://github.com/rabarar' target='_blank'>
+		  <img src='/images/footer/github-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">
+	  </a>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'rabarargithubio';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://rabarar.github.io/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/';
+        var disqus_url = 'http://rabarar.github.io/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
