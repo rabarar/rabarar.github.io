@@ -4,7 +4,7 @@
   <title><![CDATA[Category: c.h.i.p. | Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/blog/categories/c-dot-h-i-dot-p/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2016-08-06T21:58:12-04:00</updated>
+  <updated>2016-08-06T21:59:27-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -182,7 +182,7 @@ wget https://raw.githubusercontent.com/adafruit/FONA_PPP/master/fona
 
 <p>Save the file, and give it a go! To turn on and off ppp, use <code>pon`` and</code>poff&#8220;` respectivly.</p>
 
-<pre><code>sudo pon fona```
+<pre><code>sudo pon fona
 </code></pre>
 
 <p>You can verify that it worked by looking for the interface. A successful ppp session will result in a device shown when you run <code>ifconfig</code>. If you run into problems, take a look at the log files for details on what went wrong. Common problems include forgetting to turn on the FONA device!</p>
