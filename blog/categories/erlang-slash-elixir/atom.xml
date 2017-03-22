@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Erlang/elixir | Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/blog/categories/erlang-slash-elixir/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2017-03-22T12:01:37-04:00</updated>
+  <updated>2017-03-22T17:07:46-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -18,30 +18,36 @@
     <link href="http://rabarar.github.io/blog/2017/03/22/get-you-some-elixir/"/>
     <updated>2017-03-22T10:47:35-04:00</updated>
     <id>http://rabarar.github.io/blog/2017/03/22/get-you-some-elixir</id>
-    <content type="html"><![CDATA[<p>Just for fun, I thought it would be exciting to learn something new. Not just a new language, but a new paradigm of programmning. I&rsquo;ve read a bit about Functional Programming over the years, and even dabbled on college with Lisp and Prolog, but I never took the deep dive&hellip; until now.</p>
+    <content type="html"><![CDATA[<p>Just for fun, I thought it would be exciting to learn something new. Not just a new language, but a new paradigm of programmning. I&rsquo;ve read a bit about Functional Programming over the years, and even dabbled in college with Lisp and Prolog, but I never took the deep dive&hellip; until now.</p>
 
-<p>The urban legend is tall and long - Dude, one programmer on a raspberry pi hosed a billion users and the code ran for like a million years! Well, I think the hype might be exaggerated, but the truth is pretty awesome. There&rsquo;s so much going on in Erlang/Elixir that at first it can be overwhelming for someone coming to it with zero experience. And, making matters worse, is coming to it with ZERO experience with functional programming.</p>
+<p>The urban legend is tall and long - Dude, one programmer on a raspberry pi hosted a billion users and the code ran for like a million years! Well, I think the hype might be exaggerated, but the truth is pretty awesome. There&rsquo;s so much going on in Erlang/Elixir that at first glance it can be overwhelming for someone coming to it with zero experience. And, making matters worse, coming to it with ZERO experience with functional programming is an even larger leap.</p>
 
 <h2>Where to Begin</h2>
 
-<p>So, I started the journey with basically zero experience with functional programming and no experience with Erlang/Elixir. And with a lot of reading, writing, and question asking, in roughly 12 weeks, I&rsquo;ve become very comfortable with Elixir, OTP, Metaprogramming, and even some Erlang. I thought I&rsquo;d write about how to navigate the seemingly daunting process of becoming proficient.</p>
+<p>So, I started the journey with basically zero experience with functional programming and no experience with Erlang/Elixir. And with a lot of reading, writing, and question asking - in roughly 12 weeks - I&rsquo;ve become very comfortable with Elixir, OTP, Metaprogramming, and even some Erlang. I thought I&rsquo;d write about how to navigate the seemingly daunting process of becoming proficient.</p>
 
 <h3>Step 0.</h3>
 
-<p>You need to first get a development environment setup. This encompasses the Erlang/Elixir environment and an editor of choice. There are essentially two choices  source or a package manager:
-- From Source
-- From <a href="http://elixir-lang.org/install.html#mac-os-x" title="OSX Elixir Install">Brew or Mac Ports (OS X)</a>
-- From a Unix <a href="http://elixir-lang.org/install.html" title="package manager">Package Manager</a></p>
+<p>You need to first get a development environment setup. This encompasses the Erlang/Elixir environment and an editor of choice. There are essentially two choices:  building from source or a employing a package manager:</p>
+
+<ul>
+<li>From <a href="http://elixir-lang.org/install.html#compiling-from-source-unix-and-mingw" title="source install">Source</a></li>
+<li>From <a href="http://elixir-lang.org/install.html#mac-os-x" title="OSX Elixir Install">Brew or Mac Ports (OS X)</a></li>
+<li>From a Unix <a href="http://elixir-lang.org/install.html" title="package manager">Package Manager</a></li>
+</ul>
+
+
+<p>Regarding an editor, the best option here is to use your editor of choice, and then add the subsequent extensions to give you the fancy syntax highlighting and autocompletion to make your entry into Elixir that much easier. I use both Atom and Vi equipt with the above extension. For those using Sublime, you&rsquo;re in luck with the aftermarket add-ons also available to ease your editing.</p>
 
 <h3>Step 1</h3>
 
-<p>Okay, you successfully installed Erlang/Elixir. Now what?? Well, we have a few thing we need to do first. We need to take a look at the Elixir language and learn about the syntax, structures, and programming paradigms. And to do this, we need to understand how to interact with the Elixir environment to experiment and understand what these theres are and how they behaive.</p>
+<p>Okay, you successfully installed Erlang/Elixir, set up your editor -  now what?? Well, we have a few thing we need to do first. We need to step back and take a tour of the Elixir language and learn about the syntax, structures, and programming paradigms that broadly encompass the language. To do this, we need to understand how to interact with the Elixir environment and to experiment and understand what these things are and how they behave.</p>
 
-<p>I&rsquo;d start with the <a href="http://elixir-lang.org/getting-started/introduction.html" title="Getting Started">official</a> website - specifically, the Getting Started section. Work through all 22 sections.</p>
+<p>I&rsquo;d start with the <a href="http://elixir-lang.org/getting-started/introduction.html" title="Getting Started">official</a> website - specifically, the Getting Started section. Work through all 1-22 sections.</p>
 
-<p>The first section is going to introduce you to the Elixir Interactive REPL - <strong>iex</strong>. This is an indispensible tool to play and experiment, and learn!! Along with <strong>iex</strong> is <strong>elixir</strong> and <strong>elixirc</strong> a script interpreter and compiler respectivly. Finally, there are escripts which binary files that execute from the command line.</p>
+<p>The first section is going to introduce you to the Elixir Interactive REPL - <strong>iex</strong>. This is an indispensible tool to play and experiment, and learn!! Along with <strong>iex</strong> there is <strong>elixir</strong> and <strong>elixirc</strong> a script interpreter and compiler respectivly. Finally, there are escripts which are binary files that execute from the command line. More on that later.</p>
 
-<p>One cool thing about the REPL is that there is a TON of documentation built into the tool. Virtually all of the code is documented in <strong>iex</strong>. Start off by asking for help by running the help function.</p>
+<p>One cool thing about the REPL is that there is a <strong>TON</strong> of documentation built into the tool. Virtually all of the code is documented in <strong>iex</strong>. Start off by asking for help by running the help function.</p>
 
 <pre><code class="elixir">$ iex
 Erlang/OTP 19 [erts-8.3] [source] [64-bit] [smp:8:8] [async-threads:10] [hipe] [kernel-poll:false] [dtrace]
@@ -85,19 +91,20 @@ There are many other helpers available:
 - Enumerables and Streams
 - Lists, Maps, and Tuples.</p>
 
-<p>Focusing on getting these basic Elixir concepts down will make learning the other more interesting topics far easier. Once you feel that you&rsquo;ve mastered these Introductory elements, take a look at the meat of Elixir:</p>
+<p>Focusing first on getting these basic Elixir concepts down will make learning the other more interesting topics far easier. Once you feel that you&rsquo;ve mastered these Introductory elements, take a look at the meat of Elixir:</p>
 
 <ul>
 <li>Mix</li>
+<li>Applications</li>
 <li>GenServer</li>
 <li>Supervisors</li>
 <li>Macros/Metaprogramming</li>
 </ul>
 
 
-<p>Now that you&rsquo;ve taken a broad cursery overview of the language by reviewing the website, familiarizing yourself with the tools, a d experimenting with the language using the REPL, it&rsquo;s time to dive into a few books:</p>
+<p>Now that you&rsquo;ve taken a broad cursery overview of the language by reviewing the website, familiarizing yourself with the tools, and experimenting with the language using the <strong>iex</strong> REPL, it&rsquo;s time to dive into a few books to add to our newly developed perspectives.</p>
 
-<p>I found the following books very helpful:</p>
+<p>I found the following books <strong>very helpful</strong>:</p>
 
 <ul>
 <li><a href="https://www.manning.com/books/elixir-in-action" title="Elixir in Action">Elixir in Action</a></li>
@@ -110,9 +117,9 @@ There are many other helpers available:
 
 <h3>Teaser</h3>
 
-<p>So, you&rsquo;ve learned the language, experimented with some of the features, maybe even learned how to use the GenServer, Supervisors, and did a little meta-programming. What&rsquo;s next??</p>
+<p>So you&rsquo;ve learned the language, experimented with some of the features, maybe even learned how to use the GenServer, Supervisors, and did a little meta-programming. What&rsquo;s next??</p>
 
-<p>Elixir is well suited for distributed computing. iex starts a Virtual Machine that runs a BEAM. Elixir makes it easy to connect multiple BEAMS together to solve a problem.</p>
+<p>Elixir is well suited for distributed computing. <strong>iex</strong> starts a Virtual Machine called the BEAM. Elixir makes it easy to connect multiple BEAMS together to solve a problem.</p>
 
 <p>Here&rsquo;s a quick example of how easy it is to start two BEAMS and get them talking!!</p>
 
@@ -120,9 +127,11 @@ There are many other helpers available:
 
 <p>Then we&rsquo;ll need to connect the nodes and share our code.</p>
 
-<p>Lastly, we&rsquo;ll need to run the code on all of the BEAMS. Wow, that sounds complicated. And indeed in many langauges, contemplating such a task would be frought with coding challenges and gotchas. Not so much in elixir. Take a look:Elixir.Access</p>
+<p>Lastly, we&rsquo;ll need to run the code on all of the BEAMS. Wow, that sounds complicated. And indeed in many languages, contemplating such a task would be fraught with coding challenges and gotchas. Not so much in elixir.</p>
 
-<p>First, let&rsquo;s start two separate iex BEAM VM&rsquo;s:</p>
+<p>Take a look:</p>
+
+<p>First, let&rsquo;s start two separate <strong>iex</strong> BEAM VM&rsquo;s:</p>
 
 <pre><code class="elixir">iex --name foo@hostname.local --cookie monster
 </code></pre>
@@ -132,25 +141,25 @@ There are many other helpers available:
 <pre><code class="elixir">iex --name bar@hostname.local --cookie monster
 </code></pre>
 
-<p>How we give each instance its own name, and we set a cookie that allows each to connect to the other.</p>
+<p>Now we gave each instance its own name, and we set a cookie that allows each to connect to the other.</p>
 
-<p>Next we need to connect them. The simplest way to connect a node is to ping it!</p>
+<p>Next, we need to connect them. That is to say, make each node aware of the other. The simplest way to connect a node is to ping it!</p>
 
-<p>On foo - let&rsquo;s ping bar.</p>
+<p>On <strong>foo</strong> - let&rsquo;s ping <strong>bar</strong>.</p>
 
 <pre><code class="elixir">Node.ping(:"bar@hostname.local")
 :pong
 </code></pre>
 
-<p>If you didn&rsquo;t get a :pong back, you&rsquo;ve goofed. Confirm that you&rsquo;re connected by listing the Nodes.</p>
+<p>If you didn&rsquo;t get a <strong>:pong</strong> back, you&rsquo;ve goofed. Confirm that you&rsquo;ve connected the nodes together by listing the Nodes.</p>
 
 <pre><code class="elixir">Node.list
 [:"bar@hostname.local"]
 </code></pre>
 
-<p>Now we can define a module on foo and send it to bar. In order for us to send the code to other nodes, we need to have our module compiled into a beam file. So, in your editor, define a basic module:</p>
+<p>Now we can define a module on <strong>foo</strong> and send it to <strong>bar</strong>. In order for us to send the code to other nodes, we need to have our module compiled into a beam file. So, in your editor on a third terminal, define a basic module and save it to a file in the same directory that you ran the <strong>iex</strong> REPLs in:</p>
 
-<p>boo.ex
+<p>Filename: boo.ex
 <code>elixir
 defmodule Boo do
   def hi do
@@ -159,18 +168,18 @@ defmodule Boo do
 end
 </code></p>
 
-<p>How do we compile this definition into a beam? We can use iex, or we can compile it using <strong>elixirc</strong>.</p>
+<p>How do we compile this module definition into a beam file? We can use iex (<code>c/2</code> - see h c/2 for more info), or we can compile it using <strong>elixirc</strong>.</p>
 
 <pre><code>$ elixirc boo.ex
 </code></pre>
 
-<p>This will generate a file named <code>Elixir.Boo.beam</code>. Now we can move this code throughout our connected Nodes.</p>
+<p>This will generate a file named <code>Elixir.Boo.beam</code>. Now we can move this code throughout our connected Nodes using the <code>nl/1</code> function in <strong>iex</strong>.</p>
 
 <pre><code class="elixir">nl(Boo)
 {:ok, [{:"rob@mbp2016.local", :loaded, Boo}]}
 </code></pre>
 
-<p>This returns a tuple with :ok and a list of 3-tuples. The code has now been successfully sent to the other node an we can run it! There are two ways to run it. We can type into the <strong>iex</strong> on bar and run it <code>Boo.hi</code>. Or, we can run it from <code>`foo</code>.</p>
+<p>This returns a tuple with :ok and a list of three-tuples. The code has now been successfully distributed to the other connected nodes - an we can run it! There are two ways to run the defined function in <code>Boo</code>. We can type into the <strong>iex</strong> on <strong>bar</strong> and run it <code>Boo.hi</code>. Or, we can run it from <code>foo@hostname.local</code>.</p>
 
 <pre><code class="elixir">me = self()
 Node.spawn_link :"bar@hostname.local", fn -&gt;
@@ -178,13 +187,13 @@ Node.spawn_link :"bar@hostname.local", fn -&gt;
 end
 </code></pre>
 
-<p>and to retrieve the value sent from <strong>bar</strong> to <strong>foo</strong> we can use <strong>flush()</strong>:</p>
+<p>and to retrieve the value sent from <strong>bar</strong> to <strong>foo</strong> we can use <strong>flush()</strong> thereby retrieving the message sent from <strong><em>bar</em></strong> to <strong><em>foo&rsquo;s</em></strong> process:</p>
 
 <pre><code class="elixir">flush()
 {:remote_val, :hi}
 </code></pre>
 
-<p>It&rsquo;s that easy!</p>
+<p>It&rsquo;s that easy! Of course this was a trivial example. But the point is to demonstrate how easily and quickly one can develop a distributed application. Instead of sending a message, we could have just as easily performed a complex computation - using the power of all of the CPUs in the Node list.</p>
 ]]></content>
   </entry>
   
