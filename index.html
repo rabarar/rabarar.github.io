@@ -9,7 +9,7 @@
   <meta name="author" content="Rob Baruch">
 
   
-  <meta name="description" content="Configuring C.H.I.P. to go Mobile! I recently received my $9 NTC CHIPs and decided a cool use of the tiny server would be to mate it up with the &hellip;">
+  <meta name="description" content="Just for fun, I thought it would be exciting to learn something new. Not just a new language, but a new paradigm of programmning. I&rsquo;ve read a &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -65,6 +65,265 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2017/03/22/get-you-some-elixir/">Climbing Mt. Elixir/Erlang</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+<time class='entry-date' datetime='2017-03-22T10:47:35-04:00'><span class='date'><span class='date-month'>Mar</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2017</span></span> <span class='time'>10:47 am</span></time>
+        
+           | <a href="/blog/2017/03/22/get-you-some-elixir/#disqus_thread"
+             data-disqus-identifier="http://rabarar.github.io/blog/2017/03/22/get-you-some-elixir/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Just for fun, I thought it would be exciting to learn something new. Not just a new language, but a new paradigm of programmning. I&rsquo;ve read a bit about Functional Programming over the years, and even dabbled on college with Lisp and Prolog, but I never took the deep dive&hellip; until now.</p>
+
+<p>The urban legend is tall and long - Dude, one programmer on a raspberry pi hosed a billion users and the code ran for like a million years! Well, I think the hype might be exaggerated, but the truth is pretty awesome. There&rsquo;s so much going on in Erlang/Elixir that at first it can be overwhelming for someone coming to it with zero experience. And, making matters worse, is coming to it with ZERO experience with functional programming.</p>
+
+<h2>Where to Begin</h2>
+
+<p>So, I started the journey with basically zero experience with functional programming and no experience with Erlang/Elixir. And with a lot of reading, writing, and question asking, in roughly 12 weeks, I&rsquo;ve become very comfortable with Elixir, OTP, Metaprogramming, and even some Erlang. I thought I&rsquo;d write about how to navigate the seemingly daunting process of becoming proficient.</p>
+
+<h3>Step 0.</h3>
+
+<p>You need to first get a development environment setup. This encompasses the Erlang/Elixir environment and an editor of choice. There are essentially two choices  source or a package manager:
+- From Source
+- From <a href="http://elixir-lang.org/install.html#mac-os-x" title="OSX Elixir Install">Brew or Mac Ports (OS X)</a>
+- From a Unix <a href="http://elixir-lang.org/install.html" title="package manager">Package Manager</a></p>
+
+<h3>Step 1</h3>
+
+<p>Okay, you successfully installed Erlang/Elixir. Now what?? Well, we have a few thing we need to do first. We need to take a look at the Elixir language and learn about the syntax, structures, and programming paradigms. And to do this, we need to understand how to interact with the Elixir environment to experiment and understand what these theres are and how they behaive.</p>
+
+<p>I&rsquo;d start with the <a href="http://elixir-lang.org/getting-started/introduction.html" title="Getting Started">official</a> website - specifically, the Getting Started section. Work through all 22 sections.</p>
+
+<p>The first section is going to introduce you to the Elixir Interactive REPL - <strong>iex</strong>. This is an indispensible tool to play and experiment, and learn!! Along with <strong>iex</strong> is <strong>elixir</strong> and <strong>elixirc</strong> a script interpreter and compiler respectivly. Finally, there are escripts which binary files that execute from the command line.</p>
+
+<p>One cool thing about the REPL is that there is a TON of documentation built into the tool. Virtually all of the code is documented in <strong>iex</strong>. Start off by asking for help by running the help function.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="err">$</span> <span class="n">iex</span>
+</span><span class='line'><span class="nc">Erlang</span><span class="o">/</span><span class="nc">OTP</span> <span class="mi">19</span> <span class="p">[</span><span class="n">erts</span><span class="o">-</span><span class="mf">8.3</span><span class="p">]</span> <span class="p">[</span><span class="n">source</span><span class="p">]</span> <span class="p">[</span><span class="mi">64</span><span class="o">-</span><span class="n">bit</span><span class="p">]</span> <span class="p">[</span><span class="n">smp</span><span class="err">:</span><span class="mi">8</span><span class="err">:</span><span class="mi">8</span><span class="p">]</span> <span class="p">[</span><span class="n">async</span><span class="o">-</span><span class="n">threads</span><span class="err">:</span><span class="mi">10</span><span class="p">]</span> <span class="p">[</span><span class="n">hipe</span><span class="p">]</span> <span class="p">[</span><span class="n">kernel</span><span class="o">-</span><span class="n">poll</span><span class="ss">:false</span><span class="p">]</span> <span class="p">[</span><span class="n">dtrace</span><span class="p">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">Interactive</span> <span class="nc">Elixir</span> <span class="p">(</span><span class="mf">1.4</span><span class="p">.</span><span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="n">press</span> <span class="nc">Ctrl</span><span class="o">+</span><span class="nc">C</span> <span class="n">to</span> <span class="n">exit</span> <span class="p">(</span><span class="n">type</span> <span class="n">h</span><span class="p">()</span> <span class="nc">ENTER</span> <span class="k">for</span> <span class="n">help</span><span class="p">)</span>
+</span><span class='line'> <span class="err">❄❄❄</span> <span class="nc">Good</span> <span class="nc">Luck</span> <span class="n">with</span> <span class="nc">Elixir</span> <span class="err">❄❄❄</span>
+</span><span class='line'><span class="nc">I</span><span class="err">❤</span><span class="n">iex</span><span class="p">|</span><span class="mi">1</span><span class="p">|</span><span class="err">▶▶▶</span> <span class="n">h</span><span class="p">()</span>
+</span><span class='line'>
+</span><span class='line'>                                  <span class="nc">IEx.Helpers</span>
+</span><span class='line'>
+</span><span class='line'><span class="nc">Welcome</span> <span class="n">to</span> <span class="nc">Interactive</span> <span class="nc">Elixir</span><span class="p">.</span> <span class="nc">You</span> <span class="n">are</span> <span class="n">currently</span> <span class="n">seeing</span> <span class="n">the</span> <span class="n">documentation</span> <span class="k">for</span>
+</span><span class='line'><span class="n">the</span> <span class="n">module</span> <span class="nc">IEx.Helpers</span> <span class="n">which</span> <span class="n">provides</span> <span class="n">many</span> <span class="n">helpers</span> <span class="n">to</span> <span class="n">make</span> <span class="nc">Elixir</span><span class="s1">&#39;s shell more</span>
+</span><span class='line'><span class="s1">joyful to work with.</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">This message was triggered by invoking the helper h(), usually referred to as</span>
+</span><span class='line'><span class="s1">h/0 (since it expects 0 arguments).</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">You can use the h/1 function to invoke the documentation for any Elixir module</span>
+</span><span class='line'><span class="s1">or function:</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">    iex&gt; h Enum</span>
+</span><span class='line'><span class="s1">    iex&gt; h Enum.map</span>
+</span><span class='line'><span class="s1">    iex&gt; h Enum.reverse/1</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">You can also use the i/1 function to introspect any value you have in the</span>
+</span><span class='line'><span class="s1">shell:</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">    iex&gt; i &quot;hello&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">There are many other helpers available:</span>
+</span><span class='line'>
+</span><span class='line'><span class="s1">... and so on (read more)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There&rsquo;s a lot to learn in these first Twenty-Two sections:</p>
+
+<p>Pay close attention to these major concepts:
+- Pattern Matching
+- Processes
+- Recursion
+- Enumerables and Streams
+- Lists, Maps, and Tuples.</p>
+
+<p>Focusing on getting these basic Elixir concepts down will make learning the other more interesting topics far easier. Once you feel that you&rsquo;ve mastered these Introductory elements, take a look at the meat of Elixir:</p>
+
+<ul>
+<li>Mix</li>
+<li>GenServer</li>
+<li>Supervisors</li>
+<li>Macros/Metaprogramming</li>
+</ul>
+
+
+<p>Now that you&rsquo;ve taken a broad cursery overview of the language by reviewing the website, familiarizing yourself with the tools, a d experimenting with the language using the REPL, it&rsquo;s time to dive into a few books:</p>
+
+<p>I found the following books very helpful:</p>
+
+<ul>
+<li><a href="https://www.manning.com/books/elixir-in-action" title="Elixir in Action">Elixir in Action</a></li>
+<li><a href="https://www.manning.com/books/the-little-elixir-and-otp-guidebook" title="The Little Elixir and OTP Guidebook">The Little Elixir and OTP Guidebook</a></li>
+<li><a href="https://pragprog.com/book/cmelixir/metaprogramming-elixir" title="Metaprogramming Elixir">Metaprogramming Elixir</a></li>
+</ul>
+
+
+<p>And in addition to the website and the books, I strongly recommend joining the <a href="https://elixir-slackin.herokuapp.com" title="elixir slack channel">elixir slack channel</a>. There are so many knowledgable and generous people on the Slack channel willing to help you understand concepts that may seem foreign or opaque to the noob. Ask away!</p>
+
+<h3>Teaser</h3>
+
+<p>So, you&rsquo;ve learned the language, experimented with some of the features, maybe even learned how to use the GenServer, Supervisors, and did a little meta-programming. What&rsquo;s next??</p>
+
+<p>Elixir is well suited for distributed computing. iex starts a Virtual Machine that runs a BEAM. Elixir makes it easy to connect multiple BEAMS together to solve a problem.</p>
+
+<p>Here&rsquo;s a quick example of how easy it is to start two BEAMS and get them talking!!</p>
+
+<p>First we need to name each BEAM and give it a shared secret that will be common among all of the participating nodes.</p>
+
+<p>Then we&rsquo;ll need to connect the nodes and share our code.</p>
+
+<p>Lastly, we&rsquo;ll need to run the code on all of the BEAMS. Wow, that sounds complicated. And indeed in many langauges, contemplating such a task would be frought with coding challenges and gotchas. Not so much in elixir. Take a look:Elixir.Access</p>
+
+<p>First, let&rsquo;s start two separate iex BEAM VM&rsquo;s:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="n">iex</span> <span class="o">--</span><span class="n">name</span> <span class="n">foo</span><span class="na">@hostname</span><span class="p">.</span><span class="n">local</span> <span class="o">--</span><span class="n">cookie</span> <span class="n">monster</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and in another terminal window&hellip;</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="n">iex</span> <span class="o">--</span><span class="n">name</span> <span class="n">bar</span><span class="na">@hostname</span><span class="p">.</span><span class="n">local</span> <span class="o">--</span><span class="n">cookie</span> <span class="n">monster</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>How we give each instance its own name, and we set a cookie that allows each to connect to the other.</p>
+
+<p>Next we need to connect them. The simplest way to connect a node is to ping it!</p>
+
+<p>On foo - let&rsquo;s ping bar.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="nc">Node</span><span class="p">.</span><span class="n">ping</span><span class="p">(</span><span class="ss">:&quot;bar@hostname.local&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="ss">:pong</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If you didn&rsquo;t get a :pong back, you&rsquo;ve goofed. Confirm that you&rsquo;re connected by listing the Nodes.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="nc">Node</span><span class="p">.</span><span class="n">list</span>
+</span><span class='line'><span class="p">[</span><span class="ss">:&quot;bar@hostname.local&quot;</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we can define a module on foo and send it to bar. In order for us to send the code to other nodes, we need to have our module compiled into a beam file. So, in your editor, define a basic module:</p>
+
+<p>boo.ex</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="kd">defmodule</span> <span class="nc">Boo</span> <span class="k">do</span>
+</span><span class='line'>  <span class="kd">def</span> <span class="n">hi</span> <span class="k">do</span>
+</span><span class='line'>    <span class="ss">:hi</span>
+</span><span class='line'>  <span class="k">end</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>How do we compile this definition into a beam? We can use iex, or we can compile it using <strong>elixirc</strong>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="err">$</span> <span class="n">elixirc</span> <span class="n">boo</span><span class="p">.</span><span class="n">ex</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will generate a file named <code>Elixir.Boo.beam</code>. Now we can move this code throughout our connected Nodes.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="n">nl</span><span class="p">(</span><span class="nc">Boo</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span><span class="ss">:ok</span><span class="p">,</span> <span class="p">[{</span><span class="ss">:&quot;rob@mbp2016.local&quot;</span><span class="p">,</span> <span class="ss">:loaded</span><span class="p">,</span> <span class="nc">Boo</span><span class="p">}]}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This returns a tuple with :ok and a list of 3-tuples. The code has now been successfully sent to the other node an we can run it! There are two ways to run it. We can type into the <strong>iex</strong> on bar and run it <code>Boo.hi</code>. Or, we can run it from <code>`foo</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="n">me</span> <span class="p">=</span> <span class="n">self</span><span class="p">()</span>
+</span><span class='line'><span class="nc">Node</span><span class="p">.</span><span class="n">spawn_link</span> <span class="ss">:&quot;bar@hostname.local&quot;</span><span class="p">,</span> <span class="k">fn</span> <span class="p">-&gt;</span>
+</span><span class='line'>  <span class="n">send</span> <span class="n">me</span><span class="p">,</span> <span class="p">{</span><span class="ss">:remote_val</span><span class="p">,</span> <span class="nc">Boo</span><span class="p">.</span><span class="n">hi</span><span class="p">}</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and to retrieve the value sent from <strong>bar</strong> to <strong>foo</strong> we can use <strong>flush()</strong>:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='elixir'><span class='line'><span class="n">flush</span><span class="p">()</span>
+</span><span class='line'><span class="p">{</span><span class="ss">:remote_val</span><span class="p">,</span> <span class="ss">:hi</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It&rsquo;s that easy!</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -343,6 +602,30 @@
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class=''><span class='line'>sudo poff fona</span></code></pre></td></tr></table></div></figure>
 
+
+<h2>GPS</h2>
+
+<p>Now that you have your FONA and your kernel in order, you can get the GPS setup. Start off by adding the following packages:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo apt install gpsd gpsd-clients python-gps</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To start the GPS software, first stop the systemd gps services.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo systemctl stop gpsd.socket
+</span><span class='line'>sudo systemctl disable gpsd.socket</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And now start the gpsd daemon</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>sudo gpsd /dev/ttyUSB0 -F /var/run/gpsd.sock</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Use the <code>cgps</code> command to run the GPS data viewer. Or for a more detailed data view, run <code>gpsmon</code></p>
 </div>
   
   
@@ -1603,40 +1886,6 @@
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2015/02/22/goofing-around-with-atom/">Goofing Around With Atom</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-<time class='entry-date' datetime='2015-02-22T17:41:00-05:00'><span class='date'><span class='date-month'>Feb</span> <span class='date-day'>22</span><span class='date-suffix'>nd</span>, <span class='date-year'>2015</span></span> <span class='time'>5:41 pm</span></time>
-        
-           | <a href="/blog/2015/02/22/goofing-around-with-atom/#disqus_thread"
-             data-disqus-identifier="http://rabarar.github.io/blog/2015/02/22/goofing-around-with-atom/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Today, I installed Atom! It&rsquo;s nice&hellip; and certainly better than blogging using <strong>vi</strong> but I have to say the documentation isn&rsquo;t the greatest!</p>
-
-<p>I&rsquo;ll hack around at it and see if I can make it a permanent part of my blogging toolbag</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/posts/2">&larr; Older</a>
@@ -1650,6 +1899,10 @@
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2017/03/22/get-you-some-elixir/">Climbing Mt. Elixir/Erlang</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/">CHIP GSM and GPS - a Cheap Linux Mobile Platform</a>
@@ -1667,10 +1920,6 @@
         <a href="/blog/2015/09/22/jetson-tk-1-nvidia-l4t-linux-platform/">Jetson TK-1 Nvidia L4T Linux Platform</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2015/08/17/golang-on-golang/">Golang on Golang</a>
-      </li>
-    
   </ul>
 </section>
 
@@ -1684,7 +1933,7 @@
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2016 - Rob Baruch -
+  Copyright &copy; 2017 - Rob Baruch -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
   <a href='http://www.facebook.com/robertbaruch' target='_blank'>
 	    <img src='/images/footer/facebook-48.png' align=right style="display:inline;margin:2px 2px 2px 5px;">

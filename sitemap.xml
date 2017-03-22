@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://rabarar.github.io/blog/2017/03/22/get-you-some-elixir/</loc>
+    <lastmod>2017-03-22T10:47:35-04:00</lastmod>
+  </url>
+  <url>
     <loc>http://rabarar.github.io/blog/2016/08/06/chip-gsm-and-gps-a-cheap-linux-mobile-platform/</loc>
     <lastmod>2016-08-06T17:40:17-04:00</lastmod>
   </url>
@@ -211,9 +215,12 @@
     <loc>http://rabarar.github.io/blog/categories/c-dot-h-i-dot-p/</loc>
   </url>
   <url>
-    <loc>http://rabarar.github.io/posts/2/</loc>
+    <loc>http://rabarar.github.io/blog/categories/erlang-slash-elixir/</loc>
   </url>
   <url>
-    <loc>http://rabarar.github.io/posts/3/</loc>
+    <loc>http://rabarar.github.io/blog/categories/functional/</loc>
+  </url>
+  <url>
+    <loc>http://rabarar.github.io/blog/categories/programming/</loc>
   </url>
 </urlset>

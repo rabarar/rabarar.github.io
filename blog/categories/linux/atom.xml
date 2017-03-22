@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Linux | Rabarar\'s Blog]]></title>
   <link href="http://rabarar.github.io/blog/categories/linux/atom.xml" rel="self"/>
   <link href="http://rabarar.github.io/"/>
-  <updated>2016-08-06T22:49:36-04:00</updated>
+  <updated>2017-03-22T12:01:37-04:00</updated>
   <id>http://rabarar.github.io/</id>
   <author>
     <name><![CDATA[Rob Baruch]]></name>
@@ -221,6 +221,26 @@ wget https://raw.githubusercontent.com/adafruit/FONA_PPP/master/fona
 
 <pre><code>sudo poff fona
 </code></pre>
+
+<h2>GPS</h2>
+
+<p>Now that you have your FONA and your kernel in order, you can get the GPS setup. Start off by adding the following packages:</p>
+
+<pre><code>sudo apt install gpsd gpsd-clients python-gps
+</code></pre>
+
+<p>To start the GPS software, first stop the systemd gps services.</p>
+
+<pre><code>sudo systemctl stop gpsd.socket
+sudo systemctl disable gpsd.socket
+</code></pre>
+
+<p>And now start the gpsd daemon</p>
+
+<pre><code>sudo gpsd /dev/ttyUSB0 -F /var/run/gpsd.sock
+</code></pre>
+
+<p>Use the <code>cgps</code> command to run the GPS data viewer. Or for a more detailed data view, run <code>gpsmon</code></p>
 ]]></content>
   </entry>
   
